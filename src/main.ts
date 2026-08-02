@@ -60,6 +60,8 @@ config.MAX_WIND = 200;
 (config as any).play_mode = 0; // SEQUENTIAL
 (config as any).team_mode = 0;
 config.INITIAL_CASH = 5000;
+// Disable sound to avoid browser autoplay restrictions
+config.SOUND = "OFF";
 
 const game = new GameState(config, 1024, 768);
 
@@ -143,31 +145,39 @@ async function boot(): Promise<void> {
   const pct = document.getElementById("loading-pct") as HTMLElement;
   const loadingEl = document.getElementById("loading");
 
-  function hideLoading() {
+  function hideLoading(msg?: string) {
     bar.style.width = "100%";
-    pct.textContent = "Ready";
-    setTimeout(() => loadingEl?.classList.add("done"), 400);
+    pct.textContent = msg ?? "Ready";
+    pct.style.color = msg ? "#f44" : "";
+    setTimeout(() => loadingEl?.classList.add("done"), 600);
+  }
+
+  function update(msg: string, pctVal: number) {
+    pct.textContent = msg;
+    bar.style.width = pctVal + "%";
   }
 
   try {
-    bar.style.width = "30%";
-    pct.textContent = "Loading engine...";
+    // Seed the RNG
+    update("Seeding RNG...", 10);
+    rng.seed(42);
 
+    // Init engine
+    update("Starting engine...", 20);
     game.start_round();
 
-    bar.style.width = "70%";
-    pct.textContent = "Loading rockets...";
+    update("Building terrain...", 60);
 
-    // Don't block on rocket models - they're optional
-    spawnAllRockets().catch(() => {
-      console.warn("Rocket models unavailable, using fallback rendering");
-    });
+    // Spawn rockets (non-blocking)
+    update("Loading rockets...", 80);
+    spawnAllRockets().catch(() => {});
 
+    update("", 100);
     hideLoading();
     requestAnimationFrame(animate);
   } catch (err) {
     console.error("Boot failed:", err);
-    hideLoading(); // Always hide loading, even on error
+    hideLoading("Error: " + String(err).slice(0, 60));
     requestAnimationFrame(animate);
   }
 }
