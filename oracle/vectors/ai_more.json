@@ -1,0 +1,1 @@
+{"solve_power": [{"label": "reachable", "g": 0.2, "sx": 200, "sy": 600, "tx": 700, "ty": 590, "elev": 45, "power": 505.0762722761053}, {"label": "denom_le0_high_target", "g": 0.2, "sx": 200, "sy": 600, "tx": 260, "ty": 80, "elev": 5, "power": null}, {"label": "v2_le0_zero_gravity", "g": 0.0, "sx": 200, "sy": 600, "tx": 700, "ty": 590, "elev": 45, "power": null}]}

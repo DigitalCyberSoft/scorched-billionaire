@@ -141,29 +141,38 @@ function animate(): void {
 async function boot(): Promise<void> {
   const bar = document.getElementById("loading-bar") as HTMLElement;
   const pct = document.getElementById("loading-pct") as HTMLElement;
+  const loadingEl = document.getElementById("loading");
 
-  bar.style.width = "30%";
-  pct.textContent = "Loading engine...";
+  function hideLoading() {
+    bar.style.width = "100%";
+    pct.textContent = "Ready";
+    setTimeout(() => loadingEl?.classList.add("done"), 400);
+  }
 
-  // Start the game
-  game.start_round();
+  try {
+    bar.style.width = "30%";
+    pct.textContent = "Loading engine...";
 
-  bar.style.width = "70%";
-  pct.textContent = "Loading rockets...";
+    game.start_round();
 
-  await spawnAllRockets();
+    bar.style.width = "70%";
+    pct.textContent = "Loading rockets...";
 
-  bar.style.width = "100%";
-  pct.textContent = "Ready";
+    // Don't block on rocket models - they're optional
+    spawnAllRockets().catch(() => {
+      console.warn("Rocket models unavailable, using fallback rendering");
+    });
 
-  setTimeout(() => {
-    document.getElementById("loading")?.classList.add("done");
-  }, 600);
-
-  requestAnimationFrame(animate);
+    hideLoading();
+    requestAnimationFrame(animate);
+  } catch (err) {
+    console.error("Boot failed:", err);
+    hideLoading(); // Always hide loading, even on error
+    requestAnimationFrame(animate);
+  }
 }
 
-boot().catch(console.error);
+boot();
 
 // ── Dev helpers ──────────────────────────────────────────────
 (window as any).__game = game;

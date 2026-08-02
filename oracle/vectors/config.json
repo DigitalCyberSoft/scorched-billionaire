@@ -1,0 +1,2113 @@
+{
+"module": "config",
+"defaults": {
+"MAXPLAYERS": 2,
+"MAXROUNDS": 10,
+"ARMS": 4,
+"PLAY_MODE": "SEQUENTIAL",
+"PLAY_ORDER": "RANDOM",
+"TEAM_MODE": "NONE",
+"HOSTILE_ENVIRONMENT": "ON",
+"TUNNELLING": "OFF",
+"USELESS_ITEMS": "ON",
+"EXPLOSION_SCALE": "NORMAL",
+"INITIAL_CASH": 0,
+"INTEREST_RATE": 0.05,
+"COMPUTERS_BUY": "ON",
+"FREE_MARKET": "OFF",
+"SCORING": "STANDARD",
+"GRAVITY": 0.2,
+"AIR_VISCOSITY": 0,
+"MAX_WIND": 200,
+"CHANGING_WIND": "OFF",
+"ELASTIC": "NONE",
+"FALLING_TANKS": "ON",
+"EDGES_EXTEND": 75,
+"DAMAGE_TANKS_ON_IMPACT": "ON",
+"LAND1": 20,
+"LAND2": 20,
+"FLATLAND": "ON",
+"RANDOM_LAND": "ON",
+"MTN_PERCENT": 20.0,
+"SUSPEND_DIRT": 0,
+"EXTRA_DIRT": "OFF",
+"SKY": "RANDOM",
+"GRAPHICS_MODE": "1024x768",
+"LOWMEM": "OFF",
+"FIRE_DELAY": 100,
+"FALLING_DELAY": 10,
+"STATUS_BAR": "OFF",
+"ICON_BAR": "ON",
+"BOMB_ICON": "BIG",
+"TRACE": "OFF",
+"FAST_COMPUTERS": "OFF",
+"BIOS_KEYBOARD": "OFF",
+"POINTER": "Mouse",
+"MOUSE_RATE": 0.5,
+"SOUND": "ON",
+"FLY_SOUND": "OFF",
+"TALKING_TANKS": "OFF",
+"TALK_PROBABILITY": 100,
+"TALK_DELAY": 50,
+"ATTACK_COMMENTS": "talk1.cfg",
+"DIE_COMMENTS": "talk2.cfg"
+},
+"field_order": [
+"MAXPLAYERS",
+"MAXROUNDS",
+"ARMS",
+"PLAY_MODE",
+"PLAY_ORDER",
+"TEAM_MODE",
+"HOSTILE_ENVIRONMENT",
+"TUNNELLING",
+"USELESS_ITEMS",
+"EXPLOSION_SCALE",
+"INITIAL_CASH",
+"INTEREST_RATE",
+"COMPUTERS_BUY",
+"FREE_MARKET",
+"SCORING",
+"GRAVITY",
+"AIR_VISCOSITY",
+"MAX_WIND",
+"CHANGING_WIND",
+"ELASTIC",
+"FALLING_TANKS",
+"EDGES_EXTEND",
+"DAMAGE_TANKS_ON_IMPACT",
+"LAND1",
+"LAND2",
+"FLATLAND",
+"RANDOM_LAND",
+"MTN_PERCENT",
+"SUSPEND_DIRT",
+"EXTRA_DIRT",
+"SKY",
+"GRAPHICS_MODE",
+"LOWMEM",
+"FIRE_DELAY",
+"FALLING_DELAY",
+"STATUS_BAR",
+"ICON_BAR",
+"BOMB_ICON",
+"TRACE",
+"FAST_COMPUTERS",
+"BIOS_KEYBOARD",
+"POINTER",
+"MOUSE_RATE",
+"SOUND",
+"FLY_SOUND",
+"TALKING_TANKS",
+"TALK_PROBABILITY",
+"TALK_DELAY",
+"ATTACK_COMMENTS",
+"DIE_COMMENTS"
+],
+"field_types": {
+"MAXPLAYERS": "int",
+"MAXROUNDS": "int",
+"ARMS": "int",
+"PLAY_MODE": "str",
+"PLAY_ORDER": "str",
+"TEAM_MODE": "str",
+"HOSTILE_ENVIRONMENT": "str",
+"TUNNELLING": "str",
+"USELESS_ITEMS": "str",
+"EXPLOSION_SCALE": "str",
+"INITIAL_CASH": "int",
+"INTEREST_RATE": "float",
+"COMPUTERS_BUY": "str",
+"FREE_MARKET": "str",
+"SCORING": "str",
+"GRAVITY": "float",
+"AIR_VISCOSITY": "int",
+"MAX_WIND": "int",
+"CHANGING_WIND": "str",
+"ELASTIC": "str",
+"FALLING_TANKS": "str",
+"EDGES_EXTEND": "int",
+"DAMAGE_TANKS_ON_IMPACT": "str",
+"LAND1": "int",
+"LAND2": "int",
+"FLATLAND": "str",
+"RANDOM_LAND": "str",
+"MTN_PERCENT": "float",
+"SUSPEND_DIRT": "int",
+"EXTRA_DIRT": "str",
+"SKY": "str",
+"GRAPHICS_MODE": "str",
+"LOWMEM": "str",
+"FIRE_DELAY": "int",
+"FALLING_DELAY": "int",
+"STATUS_BAR": "str",
+"ICON_BAR": "str",
+"BOMB_ICON": "str",
+"TRACE": "str",
+"FAST_COMPUTERS": "str",
+"BIOS_KEYBOARD": "str",
+"POINTER": "str",
+"MOUSE_RATE": "float",
+"SOUND": "str",
+"FLY_SOUND": "str",
+"TALKING_TANKS": "str",
+"TALK_PROBABILITY": "int",
+"TALK_DELAY": "int",
+"ATTACK_COMMENTS": "str",
+"DIE_COMMENTS": "str"
+},
+"post_init": {
+"wind": 0,
+"live_elastic": 0
+},
+"enum_maps": {
+"SCORING": {
+"BASIC": 0,
+"STANDARD": 1,
+"GREEDY": 2
+},
+"TEAM_MODE": {
+"NONE": 0,
+"STANDARD": 1,
+"CORPORATE": 2,
+"VICIOUS": 3
+},
+"PLAY_MODE": {
+"SEQUENTIAL": 0,
+"SYNCHRONOUS": 1,
+"SIMULTANEOUS": 2
+},
+"PLAY_ORDER": {
+"RANDOM": 0,
+"LOSERS-FIRST": 1,
+"WINNERS-FIRST": 2,
+"ROUND-ROBIN": 3
+},
+"ELASTIC": {
+"NONE": 0,
+"WRAP": 1,
+"PADDED": 2,
+"RUBBER": 3,
+"SPRING": 4,
+"CONCRETE": 5,
+"RANDOM": 6,
+"ERRATIC": 7
+},
+"EXPLOSION_SCALE": {
+"NORMAL": 0,
+"MEDIUM": 1,
+"LARGE": 2
+}
+},
+"prop_cases": [
+{
+"field": "SCORING",
+"prop": "scoring",
+"token": "BASIC",
+"value": 0
+},
+{
+"field": "SCORING",
+"prop": "scoring",
+"token": "STANDARD",
+"value": 1
+},
+{
+"field": "SCORING",
+"prop": "scoring",
+"token": "GREEDY",
+"value": 2
+},
+{
+"field": "SCORING",
+"prop": "scoring",
+"token": "basic",
+"value": 0
+},
+{
+"field": "SCORING",
+"prop": "scoring",
+"token": "Greedy",
+"value": 2
+},
+{
+"field": "SCORING",
+"prop": "scoring",
+"token": "bogus",
+"value": 1
+},
+{
+"field": "SCORING",
+"prop": "scoring",
+"token": "",
+"value": 1
+},
+{
+"field": "SCORING",
+"prop": "scoring",
+"token": "standard ",
+"value": 1
+},
+{
+"field": "TEAM_MODE",
+"prop": "team_mode",
+"token": "NONE",
+"value": 0
+},
+{
+"field": "TEAM_MODE",
+"prop": "team_mode",
+"token": "STANDARD",
+"value": 1
+},
+{
+"field": "TEAM_MODE",
+"prop": "team_mode",
+"token": "CORPORATE",
+"value": 2
+},
+{
+"field": "TEAM_MODE",
+"prop": "team_mode",
+"token": "VICIOUS",
+"value": 3
+},
+{
+"field": "TEAM_MODE",
+"prop": "team_mode",
+"token": "none",
+"value": 0
+},
+{
+"field": "TEAM_MODE",
+"prop": "team_mode",
+"token": "Vicious",
+"value": 3
+},
+{
+"field": "TEAM_MODE",
+"prop": "team_mode",
+"token": "xyz",
+"value": 0
+},
+{
+"field": "TEAM_MODE",
+"prop": "team_mode",
+"token": "",
+"value": 0
+},
+{
+"field": "PLAY_MODE",
+"prop": "play_mode",
+"token": "SEQUENTIAL",
+"value": 0
+},
+{
+"field": "PLAY_MODE",
+"prop": "play_mode",
+"token": "SYNCHRONOUS",
+"value": 1
+},
+{
+"field": "PLAY_MODE",
+"prop": "play_mode",
+"token": "SIMULTANEOUS",
+"value": 2
+},
+{
+"field": "PLAY_MODE",
+"prop": "play_mode",
+"token": "sequential",
+"value": 0
+},
+{
+"field": "PLAY_MODE",
+"prop": "play_mode",
+"token": "Simultaneous",
+"value": 2
+},
+{
+"field": "PLAY_MODE",
+"prop": "play_mode",
+"token": "nope",
+"value": 0
+},
+{
+"field": "PLAY_ORDER",
+"prop": "play_order",
+"token": "RANDOM",
+"value": 0
+},
+{
+"field": "PLAY_ORDER",
+"prop": "play_order",
+"token": "LOSERS-FIRST",
+"value": 1
+},
+{
+"field": "PLAY_ORDER",
+"prop": "play_order",
+"token": "WINNERS-FIRST",
+"value": 2
+},
+{
+"field": "PLAY_ORDER",
+"prop": "play_order",
+"token": "ROUND-ROBIN",
+"value": 3
+},
+{
+"field": "PLAY_ORDER",
+"prop": "play_order",
+"token": "random",
+"value": 0
+},
+{
+"field": "PLAY_ORDER",
+"prop": "play_order",
+"token": "Round-Robin",
+"value": 3
+},
+{
+"field": "PLAY_ORDER",
+"prop": "play_order",
+"token": "first",
+"value": 0
+},
+{
+"field": "ELASTIC",
+"prop": "elastic",
+"token": "NONE",
+"value": 0
+},
+{
+"field": "ELASTIC",
+"prop": "elastic",
+"token": "WRAP",
+"value": 1
+},
+{
+"field": "ELASTIC",
+"prop": "elastic",
+"token": "PADDED",
+"value": 2
+},
+{
+"field": "ELASTIC",
+"prop": "elastic",
+"token": "RUBBER",
+"value": 3
+},
+{
+"field": "ELASTIC",
+"prop": "elastic",
+"token": "SPRING",
+"value": 4
+},
+{
+"field": "ELASTIC",
+"prop": "elastic",
+"token": "CONCRETE",
+"value": 5
+},
+{
+"field": "ELASTIC",
+"prop": "elastic",
+"token": "RANDOM",
+"value": 6
+},
+{
+"field": "ELASTIC",
+"prop": "elastic",
+"token": "ERRATIC",
+"value": 7
+},
+{
+"field": "ELASTIC",
+"prop": "elastic",
+"token": "concrete",
+"value": 5
+},
+{
+"field": "ELASTIC",
+"prop": "elastic",
+"token": "Wrap",
+"value": 1
+},
+{
+"field": "ELASTIC",
+"prop": "elastic",
+"token": "bounce",
+"value": 0
+},
+{
+"field": "ELASTIC",
+"prop": "elastic",
+"token": "",
+"value": 0
+},
+{
+"field": "EXPLOSION_SCALE",
+"prop": "explosion_scale",
+"token": "NORMAL",
+"value": 0
+},
+{
+"field": "EXPLOSION_SCALE",
+"prop": "explosion_scale",
+"token": "MEDIUM",
+"value": 1
+},
+{
+"field": "EXPLOSION_SCALE",
+"prop": "explosion_scale",
+"token": "LARGE",
+"value": 2
+},
+{
+"field": "EXPLOSION_SCALE",
+"prop": "explosion_scale",
+"token": "normal",
+"value": 0
+},
+{
+"field": "EXPLOSION_SCALE",
+"prop": "explosion_scale",
+"token": "Large",
+"value": 2
+},
+{
+"field": "EXPLOSION_SCALE",
+"prop": "explosion_scale",
+"token": "huge",
+"value": 0
+}
+],
+"is_on_cases": [
+{
+"field": "HOSTILE_ENVIRONMENT",
+"value": "ON",
+"out": true
+},
+{
+"field": "HOSTILE_ENVIRONMENT",
+"value": "OFF",
+"out": false
+},
+{
+"field": "HOSTILE_ENVIRONMENT",
+"value": "on",
+"out": true
+},
+{
+"field": "HOSTILE_ENVIRONMENT",
+"value": "Off",
+"out": false
+},
+{
+"field": "HOSTILE_ENVIRONMENT",
+"value": "oN",
+"out": true
+},
+{
+"field": "HOSTILE_ENVIRONMENT",
+"value": "anything",
+"out": false
+},
+{
+"field": "HOSTILE_ENVIRONMENT",
+"value": "",
+"out": false
+},
+{
+"field": "SOUND",
+"value": "ON",
+"out": true
+},
+{
+"field": "SOUND",
+"value": "off",
+"out": false
+},
+{
+"field": "SOUND",
+"value": "On",
+"out": true
+},
+{
+"field": "TRACE",
+"value": "OFF",
+"out": false
+},
+{
+"field": "TRACE",
+"value": "ON",
+"out": true
+},
+{
+"field": "FALLING_TANKS",
+"value": "ON",
+"out": true
+},
+{
+"field": "FALLING_TANKS",
+"value": "OFF",
+"out": false
+},
+{
+"field": "FALLING_TANKS",
+"value": " on ",
+"out": false
+},
+{
+"field": "FALLING_TANKS",
+"value": "ON ",
+"out": false
+},
+{
+"field": "MAXPLAYERS",
+"value": 2,
+"out": false
+},
+{
+"field": "FIRE_DELAY",
+"value": 100,
+"out": false
+}
+],
+"res_cases": [
+{
+"GRAPHICS_MODE": "1024x768",
+"out": [
+1024,
+768
+]
+},
+{
+"GRAPHICS_MODE": "640x480",
+"out": [
+640,
+480
+]
+},
+{
+"GRAPHICS_MODE": "800x600",
+"out": [
+800,
+600
+]
+},
+{
+"GRAPHICS_MODE": "640X480",
+"out": [
+640,
+480
+]
+},
+{
+"GRAPHICS_MODE": "1024X768",
+"out": [
+1024,
+768
+]
+},
+{
+"GRAPHICS_MODE": "1280x1024",
+"out": [
+1280,
+1024
+]
+},
+{
+"GRAPHICS_MODE": "320x200",
+"out": [
+320,
+200
+]
+},
+{
+"GRAPHICS_MODE": "100x200",
+"out": [
+100,
+200
+]
+},
+{
+"GRAPHICS_MODE": " 100 x 200 ",
+"out": [
+100,
+200
+]
+},
+{
+"GRAPHICS_MODE": "1x1",
+"out": [
+1,
+1
+]
+},
+{
+"GRAPHICS_MODE": "abc",
+"out": [
+1024,
+768
+]
+},
+{
+"GRAPHICS_MODE": "1024",
+"out": [
+1024,
+768
+]
+},
+{
+"GRAPHICS_MODE": "1024x768x32",
+"out": [
+1024,
+768
+]
+},
+{
+"GRAPHICS_MODE": "x",
+"out": [
+1024,
+768
+]
+},
+{
+"GRAPHICS_MODE": "12x",
+"out": [
+1024,
+768
+]
+},
+{
+"GRAPHICS_MODE": "x34",
+"out": [
+1024,
+768
+]
+},
+{
+"GRAPHICS_MODE": "1024x",
+"out": [
+1024,
+768
+]
+},
+{
+"GRAPHICS_MODE": "x768",
+"out": [
+1024,
+768
+]
+},
+{
+"GRAPHICS_MODE": "12.5x34",
+"out": [
+1024,
+768
+]
+},
+{
+"GRAPHICS_MODE": "10ax20",
+"out": [
+1024,
+768
+]
+},
+{
+"GRAPHICS_MODE": "0x10",
+"out": [
+0,
+10
+]
+},
+{
+"GRAPHICS_MODE": "1e3x2",
+"out": [
+1024,
+768
+]
+},
+{
+"GRAPHICS_MODE": "1_024x768",
+"out": [
+1024,
+768
+]
+},
+{
+"GRAPHICS_MODE": "",
+"out": [
+1024,
+768
+]
+},
+{
+"GRAPHICS_MODE": "  ",
+"out": [
+1024,
+768
+]
+},
+{
+"GRAPHICS_MODE": "1024xx768",
+"out": [
+1024,
+768
+]
+},
+{
+"GRAPHICS_MODE": "-5x-6",
+"out": [
+-5,
+-6
+]
+}
+],
+"visc_cases": [
+{
+"AIR_VISCOSITY": 0,
+"out": 1.0
+},
+{
+"AIR_VISCOSITY": 1,
+"out": 0.9999
+},
+{
+"AIR_VISCOSITY": 2,
+"out": 0.9998
+},
+{
+"AIR_VISCOSITY": 3,
+"out": 0.9997
+},
+{
+"AIR_VISCOSITY": 4,
+"out": 0.9996
+},
+{
+"AIR_VISCOSITY": 5,
+"out": 0.9995
+},
+{
+"AIR_VISCOSITY": 6,
+"out": 0.9994
+},
+{
+"AIR_VISCOSITY": 7,
+"out": 0.9993
+},
+{
+"AIR_VISCOSITY": 8,
+"out": 0.9992
+},
+{
+"AIR_VISCOSITY": 9,
+"out": 0.9991
+},
+{
+"AIR_VISCOSITY": 10,
+"out": 0.999
+},
+{
+"AIR_VISCOSITY": 11,
+"out": 0.9989
+},
+{
+"AIR_VISCOSITY": 12,
+"out": 0.9988
+},
+{
+"AIR_VISCOSITY": 13,
+"out": 0.9987
+},
+{
+"AIR_VISCOSITY": 14,
+"out": 0.9986
+},
+{
+"AIR_VISCOSITY": 15,
+"out": 0.9985
+},
+{
+"AIR_VISCOSITY": 16,
+"out": 0.9984
+},
+{
+"AIR_VISCOSITY": 17,
+"out": 0.9983
+},
+{
+"AIR_VISCOSITY": 18,
+"out": 0.9982
+},
+{
+"AIR_VISCOSITY": 19,
+"out": 0.9981
+},
+{
+"AIR_VISCOSITY": 20,
+"out": 0.998
+},
+{
+"AIR_VISCOSITY": -1,
+"out": 1.0001
+},
+{
+"AIR_VISCOSITY": 50,
+"out": 0.995
+},
+{
+"AIR_VISCOSITY": 100,
+"out": 0.99
+},
+{
+"AIR_VISCOSITY": 10000,
+"out": 0.0
+},
+{
+"AIR_VISCOSITY": 5000,
+"out": 0.5
+},
+{
+"AIR_VISCOSITY": 9999,
+"out": 9.999999999998899e-05
+},
+{
+"AIR_VISCOSITY": 12345,
+"out": -0.23449999999999993
+}
+],
+"coerce_cases": [
+{
+"type": "int",
+"in": "0",
+"out": 0
+},
+{
+"type": "int",
+"in": "42",
+"out": 42
+},
+{
+"type": "int",
+"in": "-5",
+"out": -5
+},
+{
+"type": "int",
+"in": "  7  ",
+"out": 7
+},
+{
+"type": "int",
+"in": "007",
+"out": 7
+},
+{
+"type": "int",
+"in": "1000000",
+"out": 1000000
+},
+{
+"type": "int",
+"in": "abc",
+"out": 0
+},
+{
+"type": "int",
+"in": "12.5",
+"out": 0
+},
+{
+"type": "int",
+"in": "0x10",
+"out": 0
+},
+{
+"type": "int",
+"in": "1e3",
+"out": 0
+},
+{
+"type": "int",
+"in": "+9",
+"out": 9
+},
+{
+"type": "int",
+"in": "",
+"out": 0
+},
+{
+"type": "int",
+"in": "  ",
+"out": 0
+},
+{
+"type": "int",
+"in": "1_000",
+"out": 1000
+},
+{
+"type": "int",
+"in": "_1",
+"out": 0
+},
+{
+"type": "int",
+"in": "1_",
+"out": 0
+},
+{
+"type": "int",
+"in": "1__0",
+"out": 0
+},
+{
+"type": "int",
+"in": "_",
+"out": 0
+},
+{
+"type": "int",
+"in": "1_2_3",
+"out": 123
+},
+{
+"type": "int",
+"in": "12_",
+"out": 0
+},
+{
+"type": "int",
+"in": "0_0",
+"out": 0
+},
+{
+"type": "int",
+"in": "- 5",
+"out": 0
+},
+{
+"type": "int",
+"in": "+ 5",
+"out": 0
+},
+{
+"type": "int",
+"in": "\t10\n",
+"out": 10
+},
+{
+"type": "int",
+"in": "10 ",
+"out": 10
+},
+{
+"type": "int",
+"in": "999999",
+"out": 999999
+},
+{
+"type": "int",
+"in": "-0",
+"out": 0
+},
+{
+"type": "int",
+"in": "+0",
+"out": 0
+},
+{
+"type": "int",
+"in": "100",
+"out": 100
+},
+{
+"type": "int",
+"in": "0000",
+"out": 0
+},
+{
+"type": "int",
+"in": "1.0",
+"out": 0
+},
+{
+"type": "int",
+"in": "  -123  ",
+"out": -123
+},
+{
+"type": "int",
+"in": "9_8_7_6",
+"out": 9876
+},
+{
+"type": "int",
+"in": "0b101",
+"out": 0
+},
+{
+"type": "int",
+"in": "  ",
+"out": 0
+},
+{
+"type": "int",
+"in": "true",
+"out": 0
+},
+{
+"type": "int",
+"in": "None",
+"out": 0
+},
+{
+"type": "float",
+"in": "0.05",
+"out": 0.05
+},
+{
+"type": "float",
+"in": "1",
+"out": 1.0
+},
+{
+"type": "float",
+"in": "-1.5",
+"out": -1.5
+},
+{
+"type": "float",
+"in": "  3.14 ",
+"out": 3.14
+},
+{
+"type": "float",
+"in": "1e3",
+"out": 1000.0
+},
+{
+"type": "float",
+"in": "1E-2",
+"out": 0.01
+},
+{
+"type": "float",
+"in": "inf",
+"out": "Infinity"
+},
+{
+"type": "float",
+"in": "-inf",
+"out": "-Infinity"
+},
+{
+"type": "float",
+"in": "nan",
+"out": "NaN"
+},
+{
+"type": "float",
+"in": "abc",
+"out": 0.0
+},
+{
+"type": "float",
+"in": "",
+"out": 0.0
+},
+{
+"type": "float",
+"in": ".5",
+"out": 0.5
+},
+{
+"type": "float",
+"in": "5.",
+"out": 5.0
+},
+{
+"type": "float",
+"in": "1_000.5",
+"out": 1000.5
+},
+{
+"type": "float",
+"in": "0x1p4",
+"out": 0.0
+},
+{
+"type": "float",
+"in": "+2.0",
+"out": 2.0
+},
+{
+"type": "float",
+"in": "Infinity",
+"out": "Infinity"
+},
+{
+"type": "float",
+"in": "INFINITY",
+"out": "Infinity"
+},
+{
+"type": "float",
+"in": "NaN",
+"out": "NaN"
+},
+{
+"type": "float",
+"in": "+nan",
+"out": "NaN"
+},
+{
+"type": "float",
+"in": "-NaN",
+"out": "NaN"
+},
+{
+"type": "float",
+"in": "1.0e_3",
+"out": 0.0
+},
+{
+"type": "float",
+"in": "1.0_e3",
+"out": 0.0
+},
+{
+"type": "float",
+"in": ".",
+"out": 0.0
+},
+{
+"type": "float",
+"in": "e3",
+"out": 0.0
+},
+{
+"type": "float",
+"in": "1.0.0",
+"out": 0.0
+},
+{
+"type": "float",
+"in": "  inf  ",
+"out": "Infinity"
+},
+{
+"type": "float",
+"in": "_1.0",
+"out": 0.0
+},
+{
+"type": "float",
+"in": "1.0_",
+"out": 0.0
+},
+{
+"type": "float",
+"in": "1_.0",
+"out": 0.0
+},
+{
+"type": "float",
+"in": "1._0",
+"out": 0.0
+},
+{
+"type": "float",
+"in": "0.0",
+"out": 0.0
+},
+{
+"type": "float",
+"in": "-0.0",
+"out": -0.0
+},
+{
+"type": "float",
+"in": "2e10",
+"out": 20000000000.0
+},
+{
+"type": "float",
+"in": "1.5E+3",
+"out": 1500.0
+},
+{
+"type": "float",
+"in": "123.456",
+"out": 123.456
+},
+{
+"type": "float",
+"in": "0.000001",
+"out": 1e-06
+},
+{
+"type": "float",
+"in": "1e-7",
+"out": 1e-07
+},
+{
+"type": "float",
+"in": "1e20",
+"out": 1e+20
+},
+{
+"type": "float",
+"in": "100000.0",
+"out": 100000.0
+},
+{
+"type": "float",
+"in": "  -2.5e-3 ",
+"out": -0.0025
+},
+{
+"type": "float",
+"in": "3.",
+"out": 3.0
+},
+{
+"type": "float",
+"in": ".3",
+"out": 0.3
+},
+{
+"type": "float",
+"in": "  ",
+"out": 0.0
+},
+{
+"type": "float",
+"in": "+inf",
+"out": "Infinity"
+},
+{
+"type": "float",
+"in": "1__0.0",
+"out": 0.0
+},
+{
+"type": "str",
+"in": "ON",
+"out": "ON"
+},
+{
+"type": "str",
+"in": "off",
+"out": "off"
+},
+{
+"type": "str",
+"in": "Mouse",
+"out": "Mouse"
+},
+{
+"type": "str",
+"in": "talk1.cfg",
+"out": "talk1.cfg"
+},
+{
+"type": "str",
+"in": "anything goes",
+"out": "anything goes"
+},
+{
+"type": "str",
+"in": "",
+"out": ""
+},
+{
+"type": "str",
+"in": "  spaced  ",
+"out": "  spaced  "
+}
+],
+"load_cases": [
+{
+"label": "real_scorch.cfg",
+"text": "; Configuration File for Scorched Earth Version 1.5-py\nMAXPLAYERS=2\nMAXROUNDS=10\nARMS=4\nPLAY_MODE=SEQUENTIAL\nPLAY_ORDER=RANDOM\nTEAM_MODE=NONE\nHOSTILE_ENVIRONMENT=ON\nTUNNELLING=OFF\nUSELESS_ITEMS=ON\nEXPLOSION_SCALE=NORMAL\nINITIAL_CASH=0\nINTEREST_RATE=0.05\nCOMPUTERS_BUY=ON\nFREE_MARKET=OFF\nSCORING=STANDARD\nGRAVITY=0.2\nAIR_VISCOSITY=0\nMAX_WIND=200\nCHANGING_WIND=OFF\nELASTIC=NONE\nFALLING_TANKS=ON\nEDGES_EXTEND=75\nDAMAGE_TANKS_ON_IMPACT=ON\nLAND1=20\nLAND2=20\nFLATLAND=ON\nRANDOM_LAND=ON\nMTN_PERCENT=20.0\nSUSPEND_DIRT=0\nEXTRA_DIRT=OFF\nSKY=RANDOM\nGRAPHICS_MODE=1024x768\nLOWMEM=OFF\nFIRE_DELAY=100\nFALLING_DELAY=10\nSTATUS_BAR=ON\nICON_BAR=ON\nBOMB_ICON=BIG\nTRACE=OFF\nFAST_COMPUTERS=OFF\nBIOS_KEYBOARD=OFF\nPOINTER=Mouse\nMOUSE_RATE=0.5\nSOUND=ON\nFLY_SOUND=OFF\nTALKING_TANKS=ALL\nTALK_PROBABILITY=100\nTALK_DELAY=50\nATTACK_COMMENTS=talk1.cfg\nDIE_COMMENTS=talk2.cfg\n",
+"parsed": {
+"MAXPLAYERS": 2,
+"MAXROUNDS": 10,
+"ARMS": 4,
+"PLAY_MODE": "SEQUENTIAL",
+"PLAY_ORDER": "RANDOM",
+"TEAM_MODE": "NONE",
+"HOSTILE_ENVIRONMENT": "ON",
+"TUNNELLING": "OFF",
+"USELESS_ITEMS": "ON",
+"EXPLOSION_SCALE": "NORMAL",
+"INITIAL_CASH": 0,
+"INTEREST_RATE": 0.05,
+"COMPUTERS_BUY": "ON",
+"FREE_MARKET": "OFF",
+"SCORING": "STANDARD",
+"GRAVITY": 0.2,
+"AIR_VISCOSITY": 0,
+"MAX_WIND": 200,
+"CHANGING_WIND": "OFF",
+"ELASTIC": "NONE",
+"FALLING_TANKS": "ON",
+"EDGES_EXTEND": 75,
+"DAMAGE_TANKS_ON_IMPACT": "ON",
+"LAND1": 20,
+"LAND2": 20,
+"FLATLAND": "ON",
+"RANDOM_LAND": "ON",
+"MTN_PERCENT": 20.0,
+"SUSPEND_DIRT": 0,
+"EXTRA_DIRT": "OFF",
+"SKY": "RANDOM",
+"GRAPHICS_MODE": "1024x768",
+"LOWMEM": "OFF",
+"FIRE_DELAY": 100,
+"FALLING_DELAY": 10,
+"STATUS_BAR": "ON",
+"ICON_BAR": "ON",
+"BOMB_ICON": "BIG",
+"TRACE": "OFF",
+"FAST_COMPUTERS": "OFF",
+"BIOS_KEYBOARD": "OFF",
+"POINTER": "Mouse",
+"MOUSE_RATE": 0.5,
+"SOUND": "ON",
+"FLY_SOUND": "OFF",
+"TALKING_TANKS": "ALL",
+"TALK_PROBABILITY": 100,
+"TALK_DELAY": 50,
+"ATTACK_COMMENTS": "talk1.cfg",
+"DIE_COMMENTS": "talk2.cfg"
+},
+"post_init": {
+"wind": 0,
+"live_elastic": 0
+},
+"derived": {
+"scoring": 1,
+"team_mode": 0,
+"play_mode": 0,
+"play_order": 0,
+"elastic": 0,
+"explosion_scale": 0,
+"resolution": [
+1024,
+768
+],
+"viscosity_mult": 1.0
+}
+},
+{
+"label": "empty",
+"text": "",
+"parsed": {
+"MAXPLAYERS": 2,
+"MAXROUNDS": 10,
+"ARMS": 4,
+"PLAY_MODE": "SEQUENTIAL",
+"PLAY_ORDER": "RANDOM",
+"TEAM_MODE": "NONE",
+"HOSTILE_ENVIRONMENT": "ON",
+"TUNNELLING": "OFF",
+"USELESS_ITEMS": "ON",
+"EXPLOSION_SCALE": "NORMAL",
+"INITIAL_CASH": 0,
+"INTEREST_RATE": 0.05,
+"COMPUTERS_BUY": "ON",
+"FREE_MARKET": "OFF",
+"SCORING": "STANDARD",
+"GRAVITY": 0.2,
+"AIR_VISCOSITY": 0,
+"MAX_WIND": 200,
+"CHANGING_WIND": "OFF",
+"ELASTIC": "NONE",
+"FALLING_TANKS": "ON",
+"EDGES_EXTEND": 75,
+"DAMAGE_TANKS_ON_IMPACT": "ON",
+"LAND1": 20,
+"LAND2": 20,
+"FLATLAND": "ON",
+"RANDOM_LAND": "ON",
+"MTN_PERCENT": 20.0,
+"SUSPEND_DIRT": 0,
+"EXTRA_DIRT": "OFF",
+"SKY": "RANDOM",
+"GRAPHICS_MODE": "1024x768",
+"LOWMEM": "OFF",
+"FIRE_DELAY": 100,
+"FALLING_DELAY": 10,
+"STATUS_BAR": "OFF",
+"ICON_BAR": "ON",
+"BOMB_ICON": "BIG",
+"TRACE": "OFF",
+"FAST_COMPUTERS": "OFF",
+"BIOS_KEYBOARD": "OFF",
+"POINTER": "Mouse",
+"MOUSE_RATE": 0.5,
+"SOUND": "ON",
+"FLY_SOUND": "OFF",
+"TALKING_TANKS": "OFF",
+"TALK_PROBABILITY": 100,
+"TALK_DELAY": 50,
+"ATTACK_COMMENTS": "talk1.cfg",
+"DIE_COMMENTS": "talk2.cfg"
+},
+"post_init": {
+"wind": 0,
+"live_elastic": 0
+},
+"derived": {
+"scoring": 1,
+"team_mode": 0,
+"play_mode": 0,
+"play_order": 0,
+"elastic": 0,
+"explosion_scale": 0,
+"resolution": [
+1024,
+768
+],
+"viscosity_mult": 1.0
+}
+},
+{
+"label": "comments_only",
+"text": "; header\n;another\n\n   \n",
+"parsed": {
+"MAXPLAYERS": 2,
+"MAXROUNDS": 10,
+"ARMS": 4,
+"PLAY_MODE": "SEQUENTIAL",
+"PLAY_ORDER": "RANDOM",
+"TEAM_MODE": "NONE",
+"HOSTILE_ENVIRONMENT": "ON",
+"TUNNELLING": "OFF",
+"USELESS_ITEMS": "ON",
+"EXPLOSION_SCALE": "NORMAL",
+"INITIAL_CASH": 0,
+"INTEREST_RATE": 0.05,
+"COMPUTERS_BUY": "ON",
+"FREE_MARKET": "OFF",
+"SCORING": "STANDARD",
+"GRAVITY": 0.2,
+"AIR_VISCOSITY": 0,
+"MAX_WIND": 200,
+"CHANGING_WIND": "OFF",
+"ELASTIC": "NONE",
+"FALLING_TANKS": "ON",
+"EDGES_EXTEND": 75,
+"DAMAGE_TANKS_ON_IMPACT": "ON",
+"LAND1": 20,
+"LAND2": 20,
+"FLATLAND": "ON",
+"RANDOM_LAND": "ON",
+"MTN_PERCENT": 20.0,
+"SUSPEND_DIRT": 0,
+"EXTRA_DIRT": "OFF",
+"SKY": "RANDOM",
+"GRAPHICS_MODE": "1024x768",
+"LOWMEM": "OFF",
+"FIRE_DELAY": 100,
+"FALLING_DELAY": 10,
+"STATUS_BAR": "OFF",
+"ICON_BAR": "ON",
+"BOMB_ICON": "BIG",
+"TRACE": "OFF",
+"FAST_COMPUTERS": "OFF",
+"BIOS_KEYBOARD": "OFF",
+"POINTER": "Mouse",
+"MOUSE_RATE": 0.5,
+"SOUND": "ON",
+"FLY_SOUND": "OFF",
+"TALKING_TANKS": "OFF",
+"TALK_PROBABILITY": 100,
+"TALK_DELAY": 50,
+"ATTACK_COMMENTS": "talk1.cfg",
+"DIE_COMMENTS": "talk2.cfg"
+},
+"post_init": {
+"wind": 0,
+"live_elastic": 0
+},
+"derived": {
+"scoring": 1,
+"team_mode": 0,
+"play_mode": 0,
+"play_order": 0,
+"elastic": 0,
+"explosion_scale": 0,
+"resolution": [
+1024,
+768
+],
+"viscosity_mult": 1.0
+}
+},
+{
+"label": "mixed_case_ws",
+"text": "maxplayers = 8\n  ARMS=2  \nplay_mode=simultaneous\nTeam_Mode=Corporate\nELASTIC=concrete\ngravity=10\ninterest_rate=0.125\nMtn_Percent=55.5\nair_viscosity=20\ngraphics_mode=640x480\nscoring=greedy",
+"parsed": {
+"MAXPLAYERS": 8,
+"MAXROUNDS": 10,
+"ARMS": 2,
+"PLAY_MODE": "simultaneous",
+"PLAY_ORDER": "RANDOM",
+"TEAM_MODE": "Corporate",
+"HOSTILE_ENVIRONMENT": "ON",
+"TUNNELLING": "OFF",
+"USELESS_ITEMS": "ON",
+"EXPLOSION_SCALE": "NORMAL",
+"INITIAL_CASH": 0,
+"INTEREST_RATE": 0.125,
+"COMPUTERS_BUY": "ON",
+"FREE_MARKET": "OFF",
+"SCORING": "greedy",
+"GRAVITY": 10.0,
+"AIR_VISCOSITY": 20,
+"MAX_WIND": 200,
+"CHANGING_WIND": "OFF",
+"ELASTIC": "concrete",
+"FALLING_TANKS": "ON",
+"EDGES_EXTEND": 75,
+"DAMAGE_TANKS_ON_IMPACT": "ON",
+"LAND1": 20,
+"LAND2": 20,
+"FLATLAND": "ON",
+"RANDOM_LAND": "ON",
+"MTN_PERCENT": 55.5,
+"SUSPEND_DIRT": 0,
+"EXTRA_DIRT": "OFF",
+"SKY": "RANDOM",
+"GRAPHICS_MODE": "640x480",
+"LOWMEM": "OFF",
+"FIRE_DELAY": 100,
+"FALLING_DELAY": 10,
+"STATUS_BAR": "OFF",
+"ICON_BAR": "ON",
+"BOMB_ICON": "BIG",
+"TRACE": "OFF",
+"FAST_COMPUTERS": "OFF",
+"BIOS_KEYBOARD": "OFF",
+"POINTER": "Mouse",
+"MOUSE_RATE": 0.5,
+"SOUND": "ON",
+"FLY_SOUND": "OFF",
+"TALKING_TANKS": "OFF",
+"TALK_PROBABILITY": 100,
+"TALK_DELAY": 50,
+"ATTACK_COMMENTS": "talk1.cfg",
+"DIE_COMMENTS": "talk2.cfg"
+},
+"post_init": {
+"wind": 0,
+"live_elastic": 0
+},
+"derived": {
+"scoring": 2,
+"team_mode": 2,
+"play_mode": 2,
+"play_order": 0,
+"elastic": 5,
+"explosion_scale": 0,
+"resolution": [
+640,
+480
+],
+"viscosity_mult": 0.998
+}
+},
+{
+"label": "unknown_and_noise",
+"text": "BOGUS_KEY=123\nnoequalshere\n;SOUND=OFF\nSOUND=OFF\n=emptkey\nMAXROUNDS=99",
+"parsed": {
+"MAXPLAYERS": 2,
+"MAXROUNDS": 99,
+"ARMS": 4,
+"PLAY_MODE": "SEQUENTIAL",
+"PLAY_ORDER": "RANDOM",
+"TEAM_MODE": "NONE",
+"HOSTILE_ENVIRONMENT": "ON",
+"TUNNELLING": "OFF",
+"USELESS_ITEMS": "ON",
+"EXPLOSION_SCALE": "NORMAL",
+"INITIAL_CASH": 0,
+"INTEREST_RATE": 0.05,
+"COMPUTERS_BUY": "ON",
+"FREE_MARKET": "OFF",
+"SCORING": "STANDARD",
+"GRAVITY": 0.2,
+"AIR_VISCOSITY": 0,
+"MAX_WIND": 200,
+"CHANGING_WIND": "OFF",
+"ELASTIC": "NONE",
+"FALLING_TANKS": "ON",
+"EDGES_EXTEND": 75,
+"DAMAGE_TANKS_ON_IMPACT": "ON",
+"LAND1": 20,
+"LAND2": 20,
+"FLATLAND": "ON",
+"RANDOM_LAND": "ON",
+"MTN_PERCENT": 20.0,
+"SUSPEND_DIRT": 0,
+"EXTRA_DIRT": "OFF",
+"SKY": "RANDOM",
+"GRAPHICS_MODE": "1024x768",
+"LOWMEM": "OFF",
+"FIRE_DELAY": 100,
+"FALLING_DELAY": 10,
+"STATUS_BAR": "OFF",
+"ICON_BAR": "ON",
+"BOMB_ICON": "BIG",
+"TRACE": "OFF",
+"FAST_COMPUTERS": "OFF",
+"BIOS_KEYBOARD": "OFF",
+"POINTER": "Mouse",
+"MOUSE_RATE": 0.5,
+"SOUND": "OFF",
+"FLY_SOUND": "OFF",
+"TALKING_TANKS": "OFF",
+"TALK_PROBABILITY": 100,
+"TALK_DELAY": 50,
+"ATTACK_COMMENTS": "talk1.cfg",
+"DIE_COMMENTS": "talk2.cfg"
+},
+"post_init": {
+"wind": 0,
+"live_elastic": 0
+},
+"derived": {
+"scoring": 1,
+"team_mode": 0,
+"play_mode": 0,
+"play_order": 0,
+"elastic": 0,
+"explosion_scale": 0,
+"resolution": [
+1024,
+768
+],
+"viscosity_mult": 1.0
+}
+},
+{
+"label": "bad_numbers",
+"text": "MAXPLAYERS=abc\nINITIAL_CASH=12.5\nGRAVITY=notanumber\nINTEREST_RATE=1e-2\nAIR_VISCOSITY=0x10\nMTN_PERCENT=inf\nFIRE_DELAY=1_000\nTALK_PROBABILITY=-50",
+"parsed": {
+"MAXPLAYERS": 0,
+"MAXROUNDS": 10,
+"ARMS": 4,
+"PLAY_MODE": "SEQUENTIAL",
+"PLAY_ORDER": "RANDOM",
+"TEAM_MODE": "NONE",
+"HOSTILE_ENVIRONMENT": "ON",
+"TUNNELLING": "OFF",
+"USELESS_ITEMS": "ON",
+"EXPLOSION_SCALE": "NORMAL",
+"INITIAL_CASH": 0,
+"INTEREST_RATE": 0.01,
+"COMPUTERS_BUY": "ON",
+"FREE_MARKET": "OFF",
+"SCORING": "STANDARD",
+"GRAVITY": 0.0,
+"AIR_VISCOSITY": 0,
+"MAX_WIND": 200,
+"CHANGING_WIND": "OFF",
+"ELASTIC": "NONE",
+"FALLING_TANKS": "ON",
+"EDGES_EXTEND": 75,
+"DAMAGE_TANKS_ON_IMPACT": "ON",
+"LAND1": 20,
+"LAND2": 20,
+"FLATLAND": "ON",
+"RANDOM_LAND": "ON",
+"MTN_PERCENT": "Infinity",
+"SUSPEND_DIRT": 0,
+"EXTRA_DIRT": "OFF",
+"SKY": "RANDOM",
+"GRAPHICS_MODE": "1024x768",
+"LOWMEM": "OFF",
+"FIRE_DELAY": 1000,
+"FALLING_DELAY": 10,
+"STATUS_BAR": "OFF",
+"ICON_BAR": "ON",
+"BOMB_ICON": "BIG",
+"TRACE": "OFF",
+"FAST_COMPUTERS": "OFF",
+"BIOS_KEYBOARD": "OFF",
+"POINTER": "Mouse",
+"MOUSE_RATE": 0.5,
+"SOUND": "ON",
+"FLY_SOUND": "OFF",
+"TALKING_TANKS": "OFF",
+"TALK_PROBABILITY": -50,
+"TALK_DELAY": 50,
+"ATTACK_COMMENTS": "talk1.cfg",
+"DIE_COMMENTS": "talk2.cfg"
+},
+"post_init": {
+"wind": 0,
+"live_elastic": 0
+},
+"derived": {
+"scoring": 1,
+"team_mode": 0,
+"play_mode": 0,
+"play_order": 0,
+"elastic": 0,
+"explosion_scale": 0,
+"resolution": [
+1024,
+768
+],
+"viscosity_mult": 1.0
+}
+},
+{
+"label": "equals_in_value",
+"text": "POINTER=a=b=c\nATTACK_COMMENTS=talk=weird.cfg\nDIE_COMMENTS=x",
+"parsed": {
+"MAXPLAYERS": 2,
+"MAXROUNDS": 10,
+"ARMS": 4,
+"PLAY_MODE": "SEQUENTIAL",
+"PLAY_ORDER": "RANDOM",
+"TEAM_MODE": "NONE",
+"HOSTILE_ENVIRONMENT": "ON",
+"TUNNELLING": "OFF",
+"USELESS_ITEMS": "ON",
+"EXPLOSION_SCALE": "NORMAL",
+"INITIAL_CASH": 0,
+"INTEREST_RATE": 0.05,
+"COMPUTERS_BUY": "ON",
+"FREE_MARKET": "OFF",
+"SCORING": "STANDARD",
+"GRAVITY": 0.2,
+"AIR_VISCOSITY": 0,
+"MAX_WIND": 200,
+"CHANGING_WIND": "OFF",
+"ELASTIC": "NONE",
+"FALLING_TANKS": "ON",
+"EDGES_EXTEND": 75,
+"DAMAGE_TANKS_ON_IMPACT": "ON",
+"LAND1": 20,
+"LAND2": 20,
+"FLATLAND": "ON",
+"RANDOM_LAND": "ON",
+"MTN_PERCENT": 20.0,
+"SUSPEND_DIRT": 0,
+"EXTRA_DIRT": "OFF",
+"SKY": "RANDOM",
+"GRAPHICS_MODE": "1024x768",
+"LOWMEM": "OFF",
+"FIRE_DELAY": 100,
+"FALLING_DELAY": 10,
+"STATUS_BAR": "OFF",
+"ICON_BAR": "ON",
+"BOMB_ICON": "BIG",
+"TRACE": "OFF",
+"FAST_COMPUTERS": "OFF",
+"BIOS_KEYBOARD": "OFF",
+"POINTER": "a=b=c",
+"MOUSE_RATE": 0.5,
+"SOUND": "ON",
+"FLY_SOUND": "OFF",
+"TALKING_TANKS": "OFF",
+"TALK_PROBABILITY": 100,
+"TALK_DELAY": 50,
+"ATTACK_COMMENTS": "talk=weird.cfg",
+"DIE_COMMENTS": "x"
+},
+"post_init": {
+"wind": 0,
+"live_elastic": 0
+},
+"derived": {
+"scoring": 1,
+"team_mode": 0,
+"play_mode": 0,
+"play_order": 0,
+"elastic": 0,
+"explosion_scale": 0,
+"resolution": [
+1024,
+768
+],
+"viscosity_mult": 1.0
+}
+},
+{
+"label": "all_strings",
+"text": "PLAY_MODE=SYNCHRONOUS\nPLAY_ORDER=ROUND-ROBIN\nTEAM_MODE=VICIOUS\nHOSTILE_ENVIRONMENT=OFF\nTUNNELLING=ON\nUSELESS_ITEMS=OFF\nEXPLOSION_SCALE=LARGE\nCOMPUTERS_BUY=OFF\nFREE_MARKET=ON\nSCORING=BASIC\nCHANGING_WIND=ON\nELASTIC=ERRATIC\nFALLING_TANKS=OFF\nDAMAGE_TANKS_ON_IMPACT=OFF\nFLATLAND=OFF\nRANDOM_LAND=OFF\nEXTRA_DIRT=ON\nSKY=BLUE\nGRAPHICS_MODE=800x600\nLOWMEM=ON\nSTATUS_BAR=ON\nICON_BAR=OFF\nBOMB_ICON=SMALL\nTRACE=ON\nFAST_COMPUTERS=ON\nBIOS_KEYBOARD=ON\nPOINTER=Keyboard\nSOUND=OFF\nFLY_SOUND=ON\nTALKING_TANKS=ALL\nATTACK_COMMENTS=a.cfg\nDIE_COMMENTS=b.cfg",
+"parsed": {
+"MAXPLAYERS": 2,
+"MAXROUNDS": 10,
+"ARMS": 4,
+"PLAY_MODE": "SYNCHRONOUS",
+"PLAY_ORDER": "ROUND-ROBIN",
+"TEAM_MODE": "VICIOUS",
+"HOSTILE_ENVIRONMENT": "OFF",
+"TUNNELLING": "ON",
+"USELESS_ITEMS": "OFF",
+"EXPLOSION_SCALE": "LARGE",
+"INITIAL_CASH": 0,
+"INTEREST_RATE": 0.05,
+"COMPUTERS_BUY": "OFF",
+"FREE_MARKET": "ON",
+"SCORING": "BASIC",
+"GRAVITY": 0.2,
+"AIR_VISCOSITY": 0,
+"MAX_WIND": 200,
+"CHANGING_WIND": "ON",
+"ELASTIC": "ERRATIC",
+"FALLING_TANKS": "OFF",
+"EDGES_EXTEND": 75,
+"DAMAGE_TANKS_ON_IMPACT": "OFF",
+"LAND1": 20,
+"LAND2": 20,
+"FLATLAND": "OFF",
+"RANDOM_LAND": "OFF",
+"MTN_PERCENT": 20.0,
+"SUSPEND_DIRT": 0,
+"EXTRA_DIRT": "ON",
+"SKY": "BLUE",
+"GRAPHICS_MODE": "800x600",
+"LOWMEM": "ON",
+"FIRE_DELAY": 100,
+"FALLING_DELAY": 10,
+"STATUS_BAR": "ON",
+"ICON_BAR": "OFF",
+"BOMB_ICON": "SMALL",
+"TRACE": "ON",
+"FAST_COMPUTERS": "ON",
+"BIOS_KEYBOARD": "ON",
+"POINTER": "Keyboard",
+"MOUSE_RATE": 0.5,
+"SOUND": "OFF",
+"FLY_SOUND": "ON",
+"TALKING_TANKS": "ALL",
+"TALK_PROBABILITY": 100,
+"TALK_DELAY": 50,
+"ATTACK_COMMENTS": "a.cfg",
+"DIE_COMMENTS": "b.cfg"
+},
+"post_init": {
+"wind": 0,
+"live_elastic": 0
+},
+"derived": {
+"scoring": 0,
+"team_mode": 3,
+"play_mode": 1,
+"play_order": 3,
+"elastic": 7,
+"explosion_scale": 2,
+"resolution": [
+800,
+600
+],
+"viscosity_mult": 1.0
+}
+},
+{
+"label": "crlf",
+"text": "MAXPLAYERS=3\r\nMAXROUNDS=7\r\nSOUND=OFF\r\n",
+"parsed": {
+"MAXPLAYERS": 3,
+"MAXROUNDS": 7,
+"ARMS": 4,
+"PLAY_MODE": "SEQUENTIAL",
+"PLAY_ORDER": "RANDOM",
+"TEAM_MODE": "NONE",
+"HOSTILE_ENVIRONMENT": "ON",
+"TUNNELLING": "OFF",
+"USELESS_ITEMS": "ON",
+"EXPLOSION_SCALE": "NORMAL",
+"INITIAL_CASH": 0,
+"INTEREST_RATE": 0.05,
+"COMPUTERS_BUY": "ON",
+"FREE_MARKET": "OFF",
+"SCORING": "STANDARD",
+"GRAVITY": 0.2,
+"AIR_VISCOSITY": 0,
+"MAX_WIND": 200,
+"CHANGING_WIND": "OFF",
+"ELASTIC": "NONE",
+"FALLING_TANKS": "ON",
+"EDGES_EXTEND": 75,
+"DAMAGE_TANKS_ON_IMPACT": "ON",
+"LAND1": 20,
+"LAND2": 20,
+"FLATLAND": "ON",
+"RANDOM_LAND": "ON",
+"MTN_PERCENT": 20.0,
+"SUSPEND_DIRT": 0,
+"EXTRA_DIRT": "OFF",
+"SKY": "RANDOM",
+"GRAPHICS_MODE": "1024x768",
+"LOWMEM": "OFF",
+"FIRE_DELAY": 100,
+"FALLING_DELAY": 10,
+"STATUS_BAR": "OFF",
+"ICON_BAR": "ON",
+"BOMB_ICON": "BIG",
+"TRACE": "OFF",
+"FAST_COMPUTERS": "OFF",
+"BIOS_KEYBOARD": "OFF",
+"POINTER": "Mouse",
+"MOUSE_RATE": 0.5,
+"SOUND": "OFF",
+"FLY_SOUND": "OFF",
+"TALKING_TANKS": "OFF",
+"TALK_PROBABILITY": 100,
+"TALK_DELAY": 50,
+"ATTACK_COMMENTS": "talk1.cfg",
+"DIE_COMMENTS": "talk2.cfg"
+},
+"post_init": {
+"wind": 0,
+"live_elastic": 0
+},
+"derived": {
+"scoring": 1,
+"team_mode": 0,
+"play_mode": 0,
+"play_order": 0,
+"elastic": 0,
+"explosion_scale": 0,
+"resolution": [
+1024,
+768
+],
+"viscosity_mult": 1.0
+}
+},
+{
+"label": "tabs_and_spaces",
+"text": "\tMAXPLAYERS\t=\t6\t\nARMS =\t1\n",
+"parsed": {
+"MAXPLAYERS": 6,
+"MAXROUNDS": 10,
+"ARMS": 1,
+"PLAY_MODE": "SEQUENTIAL",
+"PLAY_ORDER": "RANDOM",
+"TEAM_MODE": "NONE",
+"HOSTILE_ENVIRONMENT": "ON",
+"TUNNELLING": "OFF",
+"USELESS_ITEMS": "ON",
+"EXPLOSION_SCALE": "NORMAL",
+"INITIAL_CASH": 0,
+"INTEREST_RATE": 0.05,
+"COMPUTERS_BUY": "ON",
+"FREE_MARKET": "OFF",
+"SCORING": "STANDARD",
+"GRAVITY": 0.2,
+"AIR_VISCOSITY": 0,
+"MAX_WIND": 200,
+"CHANGING_WIND": "OFF",
+"ELASTIC": "NONE",
+"FALLING_TANKS": "ON",
+"EDGES_EXTEND": 75,
+"DAMAGE_TANKS_ON_IMPACT": "ON",
+"LAND1": 20,
+"LAND2": 20,
+"FLATLAND": "ON",
+"RANDOM_LAND": "ON",
+"MTN_PERCENT": 20.0,
+"SUSPEND_DIRT": 0,
+"EXTRA_DIRT": "OFF",
+"SKY": "RANDOM",
+"GRAPHICS_MODE": "1024x768",
+"LOWMEM": "OFF",
+"FIRE_DELAY": 100,
+"FALLING_DELAY": 10,
+"STATUS_BAR": "OFF",
+"ICON_BAR": "ON",
+"BOMB_ICON": "BIG",
+"TRACE": "OFF",
+"FAST_COMPUTERS": "OFF",
+"BIOS_KEYBOARD": "OFF",
+"POINTER": "Mouse",
+"MOUSE_RATE": 0.5,
+"SOUND": "ON",
+"FLY_SOUND": "OFF",
+"TALKING_TANKS": "OFF",
+"TALK_PROBABILITY": 100,
+"TALK_DELAY": 50,
+"ATTACK_COMMENTS": "talk1.cfg",
+"DIE_COMMENTS": "talk2.cfg"
+},
+"post_init": {
+"wind": 0,
+"live_elastic": 0
+},
+"derived": {
+"scoring": 1,
+"team_mode": 0,
+"play_mode": 0,
+"play_order": 0,
+"elastic": 0,
+"explosion_scale": 0,
+"resolution": [
+1024,
+768
+],
+"viscosity_mult": 1.0
+}
+}
+],
+"save_cases": [
+{
+"label": "defaults",
+"body": "; Configuration File for Scorched Earth Version 1.5-py\nMAXPLAYERS=2\nMAXROUNDS=10\nARMS=4\nPLAY_MODE=SEQUENTIAL\nPLAY_ORDER=RANDOM\nTEAM_MODE=NONE\nHOSTILE_ENVIRONMENT=ON\nTUNNELLING=OFF\nUSELESS_ITEMS=ON\nEXPLOSION_SCALE=NORMAL\nINITIAL_CASH=0\nINTEREST_RATE=0.05\nCOMPUTERS_BUY=ON\nFREE_MARKET=OFF\nSCORING=STANDARD\nGRAVITY=0.2\nAIR_VISCOSITY=0\nMAX_WIND=200\nCHANGING_WIND=OFF\nELASTIC=NONE\nFALLING_TANKS=ON\nEDGES_EXTEND=75\nDAMAGE_TANKS_ON_IMPACT=ON\nLAND1=20\nLAND2=20\nFLATLAND=ON\nRANDOM_LAND=ON\nMTN_PERCENT=20.0\nSUSPEND_DIRT=0\nEXTRA_DIRT=OFF\nSKY=RANDOM\nGRAPHICS_MODE=1024x768\nLOWMEM=OFF\nFIRE_DELAY=100\nFALLING_DELAY=10\nSTATUS_BAR=OFF\nICON_BAR=ON\nBOMB_ICON=BIG\nTRACE=OFF\nFAST_COMPUTERS=OFF\nBIOS_KEYBOARD=OFF\nPOINTER=Mouse\nMOUSE_RATE=0.5\nSOUND=ON\nFLY_SOUND=OFF\nTALKING_TANKS=OFF\nTALK_PROBABILITY=100\nTALK_DELAY=50\nATTACK_COMMENTS=talk1.cfg\nDIE_COMMENTS=talk2.cfg\n"
+},
+{
+"label": "mutated",
+"body": "; Configuration File for Scorched Earth Version 1.5-py\nMAXPLAYERS=8\nMAXROUNDS=10\nARMS=4\nPLAY_MODE=SEQUENTIAL\nPLAY_ORDER=RANDOM\nTEAM_MODE=NONE\nHOSTILE_ENVIRONMENT=ON\nTUNNELLING=OFF\nUSELESS_ITEMS=ON\nEXPLOSION_SCALE=NORMAL\nINITIAL_CASH=0\nINTEREST_RATE=0.125\nCOMPUTERS_BUY=ON\nFREE_MARKET=OFF\nSCORING=STANDARD\nGRAVITY=5.5\nAIR_VISCOSITY=0\nMAX_WIND=200\nCHANGING_WIND=OFF\nELASTIC=NONE\nFALLING_TANKS=ON\nEDGES_EXTEND=75\nDAMAGE_TANKS_ON_IMPACT=ON\nLAND1=99\nLAND2=20\nFLATLAND=ON\nRANDOM_LAND=ON\nMTN_PERCENT=33.0\nSUSPEND_DIRT=0\nEXTRA_DIRT=OFF\nSKY=RANDOM\nGRAPHICS_MODE=640x480\nLOWMEM=OFF\nFIRE_DELAY=100\nFALLING_DELAY=10\nSTATUS_BAR=OFF\nICON_BAR=ON\nBOMB_ICON=BIG\nTRACE=OFF\nFAST_COMPUTERS=OFF\nBIOS_KEYBOARD=OFF\nPOINTER=Mouse\nMOUSE_RATE=0.25\nSOUND=OFF\nFLY_SOUND=OFF\nTALKING_TANKS=OFF\nTALK_PROBABILITY=100\nTALK_DELAY=50\nATTACK_COMMENTS=talk1.cfg\nDIE_COMMENTS=talk2.cfg\n"
+},
+{
+"label": "roundtrip_real",
+"body": "; Configuration File for Scorched Earth Version 1.5-py\nMAXPLAYERS=2\nMAXROUNDS=10\nARMS=4\nPLAY_MODE=SEQUENTIAL\nPLAY_ORDER=RANDOM\nTEAM_MODE=NONE\nHOSTILE_ENVIRONMENT=ON\nTUNNELLING=OFF\nUSELESS_ITEMS=ON\nEXPLOSION_SCALE=NORMAL\nINITIAL_CASH=0\nINTEREST_RATE=0.05\nCOMPUTERS_BUY=ON\nFREE_MARKET=OFF\nSCORING=STANDARD\nGRAVITY=0.2\nAIR_VISCOSITY=0\nMAX_WIND=200\nCHANGING_WIND=OFF\nELASTIC=NONE\nFALLING_TANKS=ON\nEDGES_EXTEND=75\nDAMAGE_TANKS_ON_IMPACT=ON\nLAND1=20\nLAND2=20\nFLATLAND=ON\nRANDOM_LAND=ON\nMTN_PERCENT=20.0\nSUSPEND_DIRT=0\nEXTRA_DIRT=OFF\nSKY=RANDOM\nGRAPHICS_MODE=1024x768\nLOWMEM=OFF\nFIRE_DELAY=100\nFALLING_DELAY=10\nSTATUS_BAR=ON\nICON_BAR=ON\nBOMB_ICON=BIG\nTRACE=OFF\nFAST_COMPUTERS=OFF\nBIOS_KEYBOARD=OFF\nPOINTER=Mouse\nMOUSE_RATE=0.5\nSOUND=ON\nFLY_SOUND=OFF\nTALKING_TANKS=ALL\nTALK_PROBABILITY=100\nTALK_DELAY=50\nATTACK_COMMENTS=talk1.cfg\nDIE_COMMENTS=talk2.cfg\n"
+},
+{
+"label": "save_float_20",
+"body": "; Configuration File for Scorched Earth Version 1.5-py\nMAXPLAYERS=2\nMAXROUNDS=10\nARMS=4\nPLAY_MODE=SEQUENTIAL\nPLAY_ORDER=RANDOM\nTEAM_MODE=NONE\nHOSTILE_ENVIRONMENT=ON\nTUNNELLING=OFF\nUSELESS_ITEMS=ON\nEXPLOSION_SCALE=NORMAL\nINITIAL_CASH=0\nINTEREST_RATE=20.0\nCOMPUTERS_BUY=ON\nFREE_MARKET=OFF\nSCORING=STANDARD\nGRAVITY=20.0\nAIR_VISCOSITY=0\nMAX_WIND=200\nCHANGING_WIND=OFF\nELASTIC=NONE\nFALLING_TANKS=ON\nEDGES_EXTEND=75\nDAMAGE_TANKS_ON_IMPACT=ON\nLAND1=20\nLAND2=20\nFLATLAND=ON\nRANDOM_LAND=ON\nMTN_PERCENT=20.0\nSUSPEND_DIRT=0\nEXTRA_DIRT=OFF\nSKY=RANDOM\nGRAPHICS_MODE=1024x768\nLOWMEM=OFF\nFIRE_DELAY=100\nFALLING_DELAY=10\nSTATUS_BAR=OFF\nICON_BAR=ON\nBOMB_ICON=BIG\nTRACE=OFF\nFAST_COMPUTERS=OFF\nBIOS_KEYBOARD=OFF\nPOINTER=Mouse\nMOUSE_RATE=20.0\nSOUND=ON\nFLY_SOUND=OFF\nTALKING_TANKS=OFF\nTALK_PROBABILITY=100\nTALK_DELAY=50\nATTACK_COMMENTS=talk1.cfg\nDIE_COMMENTS=talk2.cfg\n"
+},
+{
+"label": "save_float_p05",
+"body": "; Configuration File for Scorched Earth Version 1.5-py\nMAXPLAYERS=2\nMAXROUNDS=10\nARMS=4\nPLAY_MODE=SEQUENTIAL\nPLAY_ORDER=RANDOM\nTEAM_MODE=NONE\nHOSTILE_ENVIRONMENT=ON\nTUNNELLING=OFF\nUSELESS_ITEMS=ON\nEXPLOSION_SCALE=NORMAL\nINITIAL_CASH=0\nINTEREST_RATE=0.05\nCOMPUTERS_BUY=ON\nFREE_MARKET=OFF\nSCORING=STANDARD\nGRAVITY=0.05\nAIR_VISCOSITY=0\nMAX_WIND=200\nCHANGING_WIND=OFF\nELASTIC=NONE\nFALLING_TANKS=ON\nEDGES_EXTEND=75\nDAMAGE_TANKS_ON_IMPACT=ON\nLAND1=20\nLAND2=20\nFLATLAND=ON\nRANDOM_LAND=ON\nMTN_PERCENT=0.05\nSUSPEND_DIRT=0\nEXTRA_DIRT=OFF\nSKY=RANDOM\nGRAPHICS_MODE=1024x768\nLOWMEM=OFF\nFIRE_DELAY=100\nFALLING_DELAY=10\nSTATUS_BAR=OFF\nICON_BAR=ON\nBOMB_ICON=BIG\nTRACE=OFF\nFAST_COMPUTERS=OFF\nBIOS_KEYBOARD=OFF\nPOINTER=Mouse\nMOUSE_RATE=0.05\nSOUND=ON\nFLY_SOUND=OFF\nTALKING_TANKS=OFF\nTALK_PROBABILITY=100\nTALK_DELAY=50\nATTACK_COMMENTS=talk1.cfg\nDIE_COMMENTS=talk2.cfg\n"
+},
+{
+"label": "save_float_third",
+"body": "; Configuration File for Scorched Earth Version 1.5-py\nMAXPLAYERS=2\nMAXROUNDS=10\nARMS=4\nPLAY_MODE=SEQUENTIAL\nPLAY_ORDER=RANDOM\nTEAM_MODE=NONE\nHOSTILE_ENVIRONMENT=ON\nTUNNELLING=OFF\nUSELESS_ITEMS=ON\nEXPLOSION_SCALE=NORMAL\nINITIAL_CASH=0\nINTEREST_RATE=0.3333333333333333\nCOMPUTERS_BUY=ON\nFREE_MARKET=OFF\nSCORING=STANDARD\nGRAVITY=0.3333333333333333\nAIR_VISCOSITY=0\nMAX_WIND=200\nCHANGING_WIND=OFF\nELASTIC=NONE\nFALLING_TANKS=ON\nEDGES_EXTEND=75\nDAMAGE_TANKS_ON_IMPACT=ON\nLAND1=20\nLAND2=20\nFLATLAND=ON\nRANDOM_LAND=ON\nMTN_PERCENT=0.3333333333333333\nSUSPEND_DIRT=0\nEXTRA_DIRT=OFF\nSKY=RANDOM\nGRAPHICS_MODE=1024x768\nLOWMEM=OFF\nFIRE_DELAY=100\nFALLING_DELAY=10\nSTATUS_BAR=OFF\nICON_BAR=ON\nBOMB_ICON=BIG\nTRACE=OFF\nFAST_COMPUTERS=OFF\nBIOS_KEYBOARD=OFF\nPOINTER=Mouse\nMOUSE_RATE=0.3333333333333333\nSOUND=ON\nFLY_SOUND=OFF\nTALKING_TANKS=OFF\nTALK_PROBABILITY=100\nTALK_DELAY=50\nATTACK_COMMENTS=talk1.cfg\nDIE_COMMENTS=talk2.cfg\n"
+},
+{
+"label": "save_float_big",
+"body": "; Configuration File for Scorched Earth Version 1.5-py\nMAXPLAYERS=2\nMAXROUNDS=10\nARMS=4\nPLAY_MODE=SEQUENTIAL\nPLAY_ORDER=RANDOM\nTEAM_MODE=NONE\nHOSTILE_ENVIRONMENT=ON\nTUNNELLING=OFF\nUSELESS_ITEMS=ON\nEXPLOSION_SCALE=NORMAL\nINITIAL_CASH=0\nINTEREST_RATE=123456.789\nCOMPUTERS_BUY=ON\nFREE_MARKET=OFF\nSCORING=STANDARD\nGRAVITY=123456.789\nAIR_VISCOSITY=0\nMAX_WIND=200\nCHANGING_WIND=OFF\nELASTIC=NONE\nFALLING_TANKS=ON\nEDGES_EXTEND=75\nDAMAGE_TANKS_ON_IMPACT=ON\nLAND1=20\nLAND2=20\nFLATLAND=ON\nRANDOM_LAND=ON\nMTN_PERCENT=123456.789\nSUSPEND_DIRT=0\nEXTRA_DIRT=OFF\nSKY=RANDOM\nGRAPHICS_MODE=1024x768\nLOWMEM=OFF\nFIRE_DELAY=100\nFALLING_DELAY=10\nSTATUS_BAR=OFF\nICON_BAR=ON\nBOMB_ICON=BIG\nTRACE=OFF\nFAST_COMPUTERS=OFF\nBIOS_KEYBOARD=OFF\nPOINTER=Mouse\nMOUSE_RATE=123456.789\nSOUND=ON\nFLY_SOUND=OFF\nTALKING_TANKS=OFF\nTALK_PROBABILITY=100\nTALK_DELAY=50\nATTACK_COMMENTS=talk1.cfg\nDIE_COMMENTS=talk2.cfg\n"
+},
+{
+"label": "save_float_tiny",
+"body": "; Configuration File for Scorched Earth Version 1.5-py\nMAXPLAYERS=2\nMAXROUNDS=10\nARMS=4\nPLAY_MODE=SEQUENTIAL\nPLAY_ORDER=RANDOM\nTEAM_MODE=NONE\nHOSTILE_ENVIRONMENT=ON\nTUNNELLING=OFF\nUSELESS_ITEMS=ON\nEXPLOSION_SCALE=NORMAL\nINITIAL_CASH=0\nINTEREST_RATE=0.0001\nCOMPUTERS_BUY=ON\nFREE_MARKET=OFF\nSCORING=STANDARD\nGRAVITY=0.0001\nAIR_VISCOSITY=0\nMAX_WIND=200\nCHANGING_WIND=OFF\nELASTIC=NONE\nFALLING_TANKS=ON\nEDGES_EXTEND=75\nDAMAGE_TANKS_ON_IMPACT=ON\nLAND1=20\nLAND2=20\nFLATLAND=ON\nRANDOM_LAND=ON\nMTN_PERCENT=0.0001\nSUSPEND_DIRT=0\nEXTRA_DIRT=OFF\nSKY=RANDOM\nGRAPHICS_MODE=1024x768\nLOWMEM=OFF\nFIRE_DELAY=100\nFALLING_DELAY=10\nSTATUS_BAR=OFF\nICON_BAR=ON\nBOMB_ICON=BIG\nTRACE=OFF\nFAST_COMPUTERS=OFF\nBIOS_KEYBOARD=OFF\nPOINTER=Mouse\nMOUSE_RATE=0.0001\nSOUND=ON\nFLY_SOUND=OFF\nTALKING_TANKS=OFF\nTALK_PROBABILITY=100\nTALK_DELAY=50\nATTACK_COMMENTS=talk1.cfg\nDIE_COMMENTS=talk2.cfg\n"
+}
+],
+"_assert_roots": [
+"defaults",
+"post_init",
+"enum_maps",
+"prop_cases",
+"is_on_cases",
+"res_cases",
+"visc_cases",
+"coerce_cases",
+"load_cases",
+"save_cases"
+]
+}

@@ -1,0 +1,118 @@
+{
+"module": "screen",
+"opaque_class": true,
+"opaque_instance": true,
+"opaque_default": true,
+"handle": [
+{
+"event": {
+"type": 1025,
+"pos": [
+10,
+20
+],
+"button": 1
+},
+"out": null
+},
+{
+"event": {
+"type": 1025,
+"pos": [
+0,
+0
+],
+"button": 3
+},
+"out": null
+},
+{
+"event": {
+"type": 1026,
+"pos": [
+5,
+5
+],
+"button": 1
+},
+"out": null
+},
+{
+"event": {
+"type": 1024,
+"pos": [
+100,
+200
+]
+},
+"out": null
+},
+{
+"event": {
+"type": 768,
+"key": 27,
+"mod": 0,
+"unicode": "\u001b"
+},
+"out": null
+},
+{
+"event": {
+"type": 768,
+"key": 13,
+"mod": 0,
+"unicode": "\r"
+},
+"out": null
+},
+{
+"event": {
+"type": 769,
+"key": 97,
+"mod": 0
+},
+"out": null
+},
+{
+"event": {
+"type": 256
+},
+"out": null
+},
+{
+"event": {},
+"out": null
+}
+],
+"update": [
+{
+"dt": 0.0,
+"out": null
+},
+{
+"dt": 0.016666666666666666,
+"out": null
+},
+{
+"dt": 0.03333333333333333,
+"out": null
+},
+{
+"dt": 0.5,
+"out": null
+},
+{
+"dt": 1.0,
+"out": null
+},
+{
+"dt": 2.5,
+"out": null
+},
+{
+"dt": -0.1,
+"out": null
+}
+],
+"draw_returns_none": true
+}
