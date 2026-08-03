@@ -2,6 +2,7 @@
  * Scorched Billionaire — Entry point.
  */
 import * as THREE from "three";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { GameState } from "./engine/game";
 import { rng } from "./engine/rng";
 import { Config } from "./engine/config";
@@ -189,6 +190,44 @@ function animate(): void {
   renderer.render(scene, camera);
 }
 
+// ── Load rocket models & terrain texture ─────────────────────
+const loader = new GLTFLoader();
+const modelPaths = ["./models/falcon9.glb", "./models/new_shepard.glb", "./models/starship.glb", "./models/delta_spaceplane.glb", "./models/terran_r.glb"];
+const loadedModels: (THREE.Group | null)[] = [];
+
+async function preloadAssets() {
+  // Load terrain texture
+  const texLoader = new THREE.TextureLoader();
+  texLoader.load("./assets/moon_surface_v2.png", (tex) => {
+    const mat = terrainMesh.material as THREE.MeshStandardMaterial;
+    mat.map = tex;
+    mat.color.set(0xffffff);
+    mat.needsUpdate = true;
+  }, undefined, () => {});
+
+  // Load rocket models
+  for (let i = 0; i < modelPaths.length; i++) {
+    try {
+      const gltf = await loader.loadAsync(modelPaths[i]);
+      loadedModels[i] = gltf.scene;
+    } catch {
+      loadedModels[i] = null;
+    }
+  }
+  // Replace markers with models
+  for (let i = 0; i < game.tanks.length; i++) {
+    const modelIdx = i < modelPaths.length ? i : 0;
+    const model = loadedModels[modelIdx];
+    if (model) {
+      const clone = model.clone();
+      clone.scale.set(0.15, 0.15, 0.15);
+      clone.position.copy(tankMarkers[i].position);
+      scene.add(clone);
+      tankMarkers[i].userData.model3d = clone;
+    }
+  }
+}
+
 // ── Boot ─────────────────────────────────────────────────────
 async function boot() {
   const bar = document.getElementById("loading-bar") as HTMLElement;
@@ -197,16 +236,16 @@ async function boot() {
 
   try {
     pct.textContent = "Generating terrain...";
-    bar.style.width = "30%";
+    bar.style.width = "20%";
     game.start_round();
 
-    pct.textContent = "Preparing battlefield...";
-    bar.style.width = "80%";
+    pct.textContent = "Loading assets...";
+    bar.style.width = "60%";
+    preloadAssets().catch(() => {});
 
     bar.style.width = "100%";
     pct.textContent = "";
 
-    // Show title screen, start game on click
     document.getElementById("btn-play")!.addEventListener("click", () => {
       titleEl.remove();
       hudEl.style.display = "block";

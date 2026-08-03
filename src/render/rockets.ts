@@ -47,14 +47,14 @@ function findChild(root: THREE.Object3D, prefix: string): THREE.Object3D | null 
 
 /** Maps tank icon index to model path. */
 const ROCKET_MODELS: Record<number, string> = {
-  0: "/models/falcon9.glb",
-  1: "/models/new_shepard.glb",
-  2: "/models/delta_spaceplane.glb",
-  3: "/models/terran_r.glb",
-  4: "/models/starship.glb",
-  5: "/models/falcon9.glb",    // fallbacks
-  6: "/models/new_shepard.glb",
-  7: "/models/starship.glb",
+  0: "./models/falcon9.glb",
+  1: "./models/new_shepard.glb",
+  2: "./models/delta_spaceplane.glb",
+  3: "./models/terran_r.glb",
+  4: "./models/starship.glb",
+  5: "./models/falcon9.glb",
+  6: "./models/new_shepard.glb",
+  7: "./models/starship.glb",
 };
 
 function modelPath(tank: Tank): string {
