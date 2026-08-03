@@ -9,6 +9,7 @@ import { Config } from "./engine/config";
 import { createTerrainMesh } from "./render/terrain";
 import { renderFrame } from "./render/loop";
 import { setEnvironment } from "./render/sky";
+import { loadExplosionTexture } from "./render/effects";
 import { preloadAllVoices, playFireTaunt, playKillTaunt, playDeathScream } from "./audio/voices";
 
 // ── Canvas & Renderer ────────────────────────────────────────
@@ -257,6 +258,7 @@ async function boot() {
     bar.style.width = "60%";
     preloadAssets().catch(() => {});
     preloadAllVoices().catch(() => {});
+    loadExplosionTexture().catch(() => {});
 
     bar.style.width = "100%";
     pct.textContent = "";

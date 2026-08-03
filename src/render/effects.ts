@@ -18,12 +18,27 @@ interface ExplosionSprite {
 
 const activeExplosions: ExplosionSprite[] = [];
 const explosionMat = new THREE.SpriteMaterial({
-  map: null, // set after texture loads
+  map: null,
   blending: THREE.AdditiveBlending,
   depthWrite: false,
   transparent: true,
   opacity: 0.8,
 });
+
+let explosionLoaded = false;
+
+/** Load the explosion sprite sheet. Call once during boot. */
+export function loadExplosionTexture(): Promise<void> {
+  return new Promise((resolve) => {
+    const loader = new THREE.TextureLoader();
+    loader.load("./assets/explosion_sheet_v4.png", (tex) => {
+      explosionMat.map = tex;
+      explosionMat.needsUpdate = true;
+      explosionLoaded = true;
+      resolve();
+    }, undefined, () => resolve());
+  });
+}
 
 /** Spawn an explosion at world position from engine explosion data. */
 export function spawnExplosion(
