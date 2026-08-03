@@ -1,16 +1,12 @@
 /**
  * Scorched Billionaire — Entry point.
- * Boots the deterministic engine and the Three.js renderer,
- * then runs the game loop bridging engine state to 3D visuals.
  */
-
 import * as THREE from "three";
-import { GameState, AIM, FIRING, SETTLE, TURN_START, PLACE } from "./engine/game";
+import { GameState } from "./engine/game";
 import { rng } from "./engine/rng";
 import { Config } from "./engine/config";
-import { createTerrainMesh } from "./render/terrain";
-import { spawnRocket } from "./render/rockets";
-import { renderFrame, roundToEnvironment } from "./render/loop";
+import { createTerrainMesh, updateTerrainFromEngine } from "./render/terrain";
+import { renderFrame } from "./render/loop";
 import { setEnvironment } from "./render/sky";
 
 // ── Canvas & Renderer ────────────────────────────────────────
@@ -22,9 +18,9 @@ renderer.shadowMap.enabled = true;
 
 // ── Scene ────────────────────────────────────────────────────
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x0a0a1a);
+scene.background = new THREE.Color(0x1a1a2e);
 
-// ── Camera (orthographic, locked side-view) ──────────────────
+// ── Camera ───────────────────────────────────────────────────
 const aspect = window.innerWidth / window.innerHeight;
 const viewHeight = 800;
 const viewWidth = viewHeight * aspect;
@@ -33,209 +29,198 @@ const camera = new THREE.OrthographicCamera(
   viewHeight / 2, -viewHeight / 2,
   0.1, 2000,
 );
-camera.position.set(0, 100, 500);
-camera.lookAt(0, 350, 0);
+camera.position.set(0, -100, 600);
+camera.lookAt(0, 200, 0);
 
 // ── Lighting ─────────────────────────────────────────────────
-const ambient = new THREE.AmbientLight(0x404060, 0.6);
-scene.add(ambient);
-const sun = new THREE.DirectionalLight(0xffffcc, 1.2);
-sun.position.set(200, 400, 100);
-sun.castShadow = true;
-sun.shadow.mapSize.set(1024, 1024);
-sun.shadow.camera.left = -600;
-sun.shadow.camera.right = 600;
-sun.shadow.camera.top = 400;
-sun.shadow.camera.bottom = -400;
+scene.add(new THREE.AmbientLight(0xffffff, 0.8));
+const sun = new THREE.DirectionalLight(0xffffcc, 1.5);
+sun.position.set(200, 400, 300);
 scene.add(sun);
+scene.add(new THREE.HemisphereLight(0x4488cc, 0x224422, 0.4));
+
+// ── Sky gradient plane ───────────────────────────────────────
+const skyGeo = new THREE.PlaneGeometry(viewWidth * 3, 600);
+const skyMat = new THREE.ShaderMaterial({
+  uniforms: {
+    topColor: { value: new THREE.Color(0x0077ff) },
+    bottomColor: { value: new THREE.Color(0xccccdd) },
+  },
+  vertexShader: `varying vec2 vUv; void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }`,
+  fragmentShader: `varying vec2 vUv; uniform vec3 topColor; uniform vec3 bottomColor; void main() { gl_FragColor = vec4(mix(bottomColor, topColor, vUv.y), 1.0); }`,
+  depthWrite: false,
+});
+const skyPlane = new THREE.Mesh(skyGeo, skyMat);
+skyPlane.position.set(0, 450, -50);
+scene.add(skyPlane);
 
 // ── Engine ───────────────────────────────────────────────────
-const SEED = 42;
-rng.seed(SEED);
-
+rng.seed(42);
 const config = new Config();
 config.GRAVITY = 0.2;
 config.wind = 0;
 config.MAX_WIND = 200;
 config.INITIAL_CASH = 5000;
-// Disable sound to avoid browser autoplay restrictions
 config.SOUND = "OFF";
 
 const game = new GameState(config, 1024, 768);
-
-// Add tanks
-game.add_player("Elon Musk", 0, 0, 0);    // human
-game.add_player("Jeff Bezos", 1, 1, 1);    // AI Moron
-game.add_player("Trump", 4, 2, 7);          // AI Tosser
-game.add_player("Scam Altman", 5, 3, 7);    // AI Chooser
+game.add_player("Elon Musk", 0, 0, 0);
+game.add_player("Jeff Bezos", 1, 1, 1);
+game.add_player("Donald Trump", 4, 2, 7);
+game.add_player("Scam Altman", 5, 3, 7);
 game.new_game();
 
-// ── Terrain mesh (driven by engine) ──────────────────────────
+// ── Terrain ──────────────────────────────────────────────────
 const terrainMesh = createTerrainMesh(game.terrain, viewWidth);
-terrainMesh.material = new THREE.MeshStandardMaterial({ color: 0x5c4033, flatShading: true });
+terrainMesh.position.set(0, 0, 0);
 scene.add(terrainMesh);
 
-// ── Placeholder rockets (colored cylinders) ──────────────────
+// ── Tank markers (colored capsules) ──────────────────────────
 const tankMarkers: THREE.Mesh[] = [];
-const tankColors = [0x4488ff, 0xff8844, 0xff4444, 0x44ff44];
+const tankColors = [0x4488ff, 0xff8844, 0xff2222, 0x44dd44];
+const tankNames = ["Elon", "Bezos", "Trump", "Altman"];
 for (let i = 0; i < game.tanks.length; i++) {
-  const geo = new THREE.CylinderGeometry(4, 5, 20, 8);
-  const mat = new THREE.MeshStandardMaterial({ color: tankColors[i], flatShading: true });
-  const marker = new THREE.Mesh(geo, mat);
-  marker.position.set(0, 0, 0);
-  marker.visible = false;
-  scene.add(marker);
-  tankMarkers.push(marker);
+  const group = new THREE.Group();
+  // Body
+  const bodyGeo = new THREE.CylinderGeometry(3, 4, 18, 8);
+  const bodyMat = new THREE.MeshStandardMaterial({ color: tankColors[i], flatShading: true });
+  const body = new THREE.Mesh(bodyGeo, bodyMat);
+  body.position.y = 9;
+  group.add(body);
+  // Nose cone
+  const noseGeo = new THREE.ConeGeometry(3, 6, 8);
+  const nose = new THREE.Mesh(noseGeo, bodyMat);
+  nose.position.y = 21;
+  group.add(nose);
+  // Label
+  const sprite = new THREE.Sprite(new THREE.SpriteMaterial({
+    map: createLabelTexture(tankNames[i], tankColors[i]),
+    transparent: true,
+    depthTest: false,
+  }));
+  sprite.position.y = 28;
+  sprite.scale.set(30, 10, 1);
+  group.add(sprite);
+  group.visible = false;
+  scene.add(group);
+  tankMarkers.push(group as any);
+  tankMarkers[i].userData = { body };
 }
 
-// ── HUD overlay ───────────────────────────────────────────────
+function createLabelTexture(text: string, color: number): THREE.Texture {
+  const c = document.createElement("canvas");
+  c.width = 256; c.height = 64;
+  const ctx = c.getContext("2d")!;
+  ctx.fillStyle = "#" + color.toString(16).padStart(6, "0");
+  ctx.font = "bold 28px system-ui";
+  ctx.textAlign = "center";
+  ctx.fillText(text, 128, 40);
+  const tex = new THREE.CanvasTexture(c);
+  tex.minFilter = THREE.LinearFilter;
+  return tex;
+}
+
+// ── Title screen ─────────────────────────────────────────────
+const titleEl = document.createElement("div");
+titleEl.id = "title-screen";
+titleEl.innerHTML = `
+  <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;
+    background:radial-gradient(ellipse at center,#0a0a2e 0%,#000 70%);font-family:system-ui;">
+    <h1 style="font-size:56px;color:#e94560;letter-spacing:6px;text-shadow:3px 3px 0 #000;margin:0;">SCORCHED BILLIONAIRE</h1>
+    <p style="color:#e08bb0;font-size:20px;margin:8px 0 36px;">The Mother of All VC Rounds</p>
+    <button id="btn-play" style="padding:14px 56px;font-size:22px;background:#e94560;color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:700;letter-spacing:2px;">PLAY</button>
+    <p style="color:#555;margin-top:32px;font-size:12px;max-width:500px;text-align:center;">4 billionaires. 3 planets. 48 weapons. <br>Arrow keys to aim. Space to fire. Tab for weapons.</p>
+  </div>`;
+titleEl.style.cssText = "position:fixed;inset:0;z-index:200;";
+document.body.appendChild(titleEl);
+
+// ── HUD ──────────────────────────────────────────────────────
 const hudEl = document.createElement("div");
-hudEl.id = "game-hud";
-hudEl.style.cssText = "position:fixed;top:10px;left:10px;z-index:20;color:#fff;font-family:system-ui;font-size:16px;background:rgba(0,0,0,0.6);padding:8px 12px;border-radius:6px;pointer-events:none;";
+hudEl.style.cssText = "position:fixed;top:10px;left:10px;z-index:20;color:#fff;font-family:system-ui;font-size:14px;background:rgba(0,0,0,0.7);padding:8px 14px;border-radius:6px;pointer-events:none;display:none;";
 document.body.appendChild(hudEl);
 
-// ── Environment ──────────────────────────────────────────────
-setEnvironment(scene, "earth");
-
-// ── Spawn rockets ────────────────────────────────────────────
-async function spawnAllRockets(): Promise<void> {
-  for (const t of game.tanks) {
-    try {
-      await spawnRocket(t, scene);
-    } catch {
-      // Model not available yet; will retry with placeholder
-      console.warn(`No 3D model for ${t.name}, using fallback`);
-    }
-  }
-}
-
 // ── Input ────────────────────────────────────────────────────
-const keys: Record<string, boolean> = {};
-
 window.addEventListener("keydown", (e) => {
-  keys[e.key] = true;
-
-  if (game.phase === AIM && game.awaiting_human) {
-    const tank = game.current_shooter!;
-    if (e.key === "ArrowLeft") tank.angle = Math.min(180, tank.angle + 2);
-    if (e.key === "ArrowRight") tank.angle = Math.max(0, tank.angle - 2);
-    if (e.key === "ArrowUp") tank.power = Math.min(1000, tank.power + 25);
-    if (e.key === "ArrowDown") tank.power = Math.max(0, tank.power - 25);
-    if (e.key === "Tab") {
-      e.preventDefault();
-      tank.selected_weapon = (tank.selected_weapon + 1) % 32; // cycle weapons
-    }
-    if (e.key === " " || e.key === "Enter") {
-      e.preventDefault();
-      game.fire();
-    }
+  if (game.phase === "aim" && game.awaiting_human) {
+    const t = game.current_shooter!;
+    if (e.key === "ArrowLeft") t.angle = Math.min(180, t.angle + 3);
+    if (e.key === "ArrowRight") t.angle = Math.max(0, t.angle - 3);
+    if (e.key === "ArrowUp") t.power = Math.min(1000, t.power + 30);
+    if (e.key === "ArrowDown") t.power = Math.max(0, t.power - 30);
+    if (e.key === "Tab") { e.preventDefault(); t.selected_weapon = (t.selected_weapon + 1) % 32; }
+    if (e.key === " " || e.key === "Enter") { e.preventDefault(); game.fire(); }
   }
-});
-
-window.addEventListener("keyup", (e) => {
-  keys[e.key] = false;
 });
 
 // ── Resize ───────────────────────────────────────────────────
 window.addEventListener("resize", () => {
   const a = window.innerWidth / window.innerHeight;
-  const vh = 800;
-  const vw = vh * a;
-  camera.left = -vw / 2;
-  camera.right = vw / 2;
-  camera.top = vh / 2;
-  camera.bottom = -vh / 2;
+  const vh = 800; const vw = vh * a;
+  camera.left = -vw / 2; camera.right = vw / 2;
+  camera.top = vh / 2; camera.bottom = -vh / 2;
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
 });
 
-// ── Render loop ──────────────────────────────────────────────
+// ── Render ───────────────────────────────────────────────────
 function animate(): void {
   requestAnimationFrame(animate);
-
   renderFrame(game, scene, camera, terrainMesh);
 
-  // Update tank markers
   for (let i = 0; i < game.tanks.length; i++) {
     const t = game.tanks[i];
-    if (t.alive) {
-      const px = Math.round(t.x);
-      for (let py = 0; py < game.terrain.h; py++) {
-        if (game.terrain.is_dirt(px, py)) {
-          tankMarkers[i].position.set(px - game.w / 2, ((game.h - py) / game.h) * 300, 0);
-          tankMarkers[i].visible = true;
-          break;
-        }
+    if (!t.alive) { tankMarkers[i].visible = false; continue; }
+    const px = Math.round(t.x);
+    for (let py = 0; py < game.terrain.h; py++) {
+      if (game.terrain.is_dirt(px, py)) {
+        tankMarkers[i].position.set(px - game.w / 2, ((game.h - py) / game.h) * 300 + 4, 0);
+        tankMarkers[i].visible = true;
+        break;
       }
-    } else {
-      tankMarkers[i].visible = false;
     }
   }
 
-  // Update HUD
-  const shooter = game.current_shooter;
-  if (shooter) {
-    const phaseNames: Record<string, string> = { aim: "AIM", turn_start: "WATCH", firing: "FLIGHT", settle: "SETTLE" };
-    hudEl.textContent = `${shooter.name} | ${phaseNames[game.phase] || game.phase} | Angle: ${shooter.angle}° Power: ${shooter.power} | Wind: ${game.cfg.wind}`;
+  const s = game.current_shooter;
+  if (s) {
+    const p: Record<string, string> = { aim: "🎯 YOUR TURN", turn_start: "⏳", firing: "🔥", settle: "💨" };
+    hudEl.innerHTML = `<b>${s.name}</b> &nbsp; ${p[game.phase] || game.phase} &nbsp; | &nbsp; ${s.angle}° &nbsp; ${s.power} &nbsp; | Wind: ${game.cfg.wind}`;
   }
 
   renderer.render(scene, camera);
 }
 
 // ── Boot ─────────────────────────────────────────────────────
-let gameStarted = false;
-
-async function boot(): Promise<void> {
+async function boot() {
   const bar = document.getElementById("loading-bar") as HTMLElement;
   const pct = document.getElementById("loading-pct") as HTMLElement;
-  const loadingEl = document.getElementById("loading");
-
-  function hideLoading(msg?: string) {
-    bar.style.width = "100%";
-    pct.textContent = msg ?? "Click anywhere to play";
-    pct.style.color = msg ? "#f44" : "";
-  }
-
-  function update(msg: string, pctVal: number) {
-    pct.textContent = msg;
-    bar.style.width = pctVal + "%";
-  }
+  const loadingEl = document.getElementById("loading")!;
 
   try {
-    update("Seeding RNG...", 10);
-    rng.seed(42);
-
-    update("Starting engine...", 20);
+    pct.textContent = "Generating terrain...";
+    bar.style.width = "30%";
     game.start_round();
 
-    update("Building terrain...", 60);
+    pct.textContent = "Preparing battlefield...";
+    bar.style.width = "80%";
 
-    update("Loading rockets...", 80);
-    spawnAllRockets().catch(() => {});
+    bar.style.width = "100%";
+    pct.textContent = "";
 
-    update("", 100);
-    hideLoading();
-
-    // Start game on first click/key
-    function startGame() {
-      if (gameStarted) return;
-      gameStarted = true;
-      loadingEl?.classList.add("done");
+    // Show title screen, start game on click
+    document.getElementById("btn-play")!.addEventListener("click", () => {
+      titleEl.remove();
+      hudEl.style.display = "block";
+      loadingEl.classList.add("done");
       requestAnimationFrame(animate);
-      document.removeEventListener("click", startGame);
-      document.removeEventListener("keydown", startGame);
-    }
-    document.addEventListener("click", startGame);
-    document.addEventListener("keydown", startGame);
+    });
+
   } catch (err) {
-    console.error("Boot failed:", err);
-    hideLoading("Error: " + String(err).slice(0, 60));
+    console.error(err);
+    pct.textContent = "Error loading";
+    setTimeout(() => loadingEl.classList.add("done"), 1000);
     requestAnimationFrame(animate);
   }
 }
 
+setEnvironment(scene, "earth");
 boot();
-
-// ── Dev helpers ──────────────────────────────────────────────
-(window as any).__game = game;
-(window as any).__scene = scene;
