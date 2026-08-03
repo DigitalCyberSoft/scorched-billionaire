@@ -26,6 +26,7 @@ import {
 } from "./net/multiplayer";
 import type { RoomPlayer } from "./engine/net/match";
 import { setRelayOverride } from "./engine/net/netconfig";
+import { DEVICE_ID } from "./engine/net/identity";
 
 // ── Relay override for tests/deployments: ?relays=ws://127.0.0.1:4747 ──
 {
@@ -608,6 +609,9 @@ function submitOnlineShop(gs: GameState): void {
   const localIdx = localHumanIndex(gs);
   const t = gs.tanks[localIdx];
   if (!t) return;
+  // sendShop() broadcasts but does NOT echo the local cart back through
+  // onShopResult — record it locally so the host's all-in barrier sees it.
+  mpCarts.set(DEVICE_ID, { round: gs.round_index, inv: t.inventory.slice(), cash: t.cash });
   s.session.sendShop(gs.round_index, t.inventory.slice(), t.cash);
   mpLocalDone = true;
   shopOpen?.destroy();

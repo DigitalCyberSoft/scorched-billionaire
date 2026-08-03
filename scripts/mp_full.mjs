@@ -3,7 +3,7 @@ const bA = await puppeteer.launch({ headless: true, args: ["--no-sandbox"], prot
 const bB = await puppeteer.launch({ headless: true, args: ["--no-sandbox"], protocolTimeout: 90000 });
 const host = await bA.newPage();
 const guest = await bB.newPage();
-const URL = "http://localhost:4173/?relays=ws://127.0.0.1:4748";
+const URL = process.argv[2] ?? "http://localhost:4173/?relays=ws://127.0.0.1:4748";
 
 await host.goto(URL, { waitUntil: "networkidle2", timeout: 60000 });
 await host.click("#btn-online"); await host.waitForSelector("#lobby", { timeout: 10000 });
