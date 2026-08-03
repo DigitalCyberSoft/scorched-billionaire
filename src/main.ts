@@ -57,8 +57,6 @@ const config = new Config();
 config.GRAVITY = 0.2;
 config.wind = 0;
 config.MAX_WIND = 200;
-(config as any).play_mode = 0; // SEQUENTIAL
-(config as any).team_mode = 0;
 config.INITIAL_CASH = 5000;
 // Disable sound to avoid browser autoplay restrictions
 config.SOUND = "OFF";
