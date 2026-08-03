@@ -1,107 +1,159 @@
 /**
- * Multiplayer adapter: wires the Nostr-signaled WebRTC lockstep
- * netcode from src/engine/net/ to the Scorched Billionaire game loop.
+ * Multiplayer wiring: host/join a match over Nostr-signaled WebRTC and run
+ * host-authoritative lockstep over the deterministic engine.
  *
- * The protocol is host-authoritative lockstep:
- * - Host fixes seed, config, and turn order.
- * - Each turn: only the active player's input is broadcast.
- * - Every client re-runs the same deterministic engine.
- * - Post-turn world hash exchange detects divergence.
+ * The protocol modules (src/engine/net/*) are the battle-tested port from
+ * scorchedearth-multi (their lockstep determinism suites pass in this repo).
+ * This module is the thin wiring: Match lifecycle, LockstepSession + EngineAdapter,
+ * turn input routing, and chat — consuming the same GameState the 3D renderer draws.
  */
 
+import { Match, type MatchInfo, type RoomPlayer, type Role } from "../engine/net/match";
+import { LockstepSession, type MatchStart, type TurnInput } from "../engine/net/lockstep";
+import { createEngineAdapter, type GameEngineAdapter } from "../engine/net/engine_adapter";
+import { DEVICE_ID } from "../engine/net/identity";
+import { Config } from "../engine/config";
 import type { GameState } from "../engine/game";
+import type { Tank } from "../engine/objects";
 
-// ── Configuration ────────────────────────────────────────────
-
-/** STUN/TURN servers for WebRTC. Metered TURN free tier (50 GB/month). */
-export const ICE_SERVERS: RTCIceServer[] = [
-  { urls: "stun:stun.l.google.com:19302" },
-  { urls: "stun:stun1.l.google.com:19302" },
-  {
-    urls: "turn:turn.metered.ca:3478?transport=udp",
-    username: "scorched-billionaire",
-    credential: "scorched-billionaire-turn",
-  },
-  {
-    urls: "turn:turn.metered.ca:3478?transport=tcp",
-    username: "scorched-billionaire",
-    credential: "scorched-billionaire-turn",
-  },
-];
-
-// ── Types ────────────────────────────────────────────────────
-
-export type MultiplayerMode = "local" | "host" | "guest";
-
-export interface MultiplayerState {
-  mode: MultiplayerMode;
-  roomCode: string | null;
-  peerCount: number;
-  connected: boolean;
+export interface OnlineSession {
+  match: Match;
+  session: LockstepSession;
+  adapter: GameEngineAdapter;
+  role: Role;
 }
 
-// ── Stub implementation ──────────────────────────────────────
+let current: OnlineSession | null = null;
+let pendingStart: MatchStart | null = null;
 
-/**
- * Full multiplayer integration depends on the Nostr relay connection
- * and WebRTC handshake from src/engine/net/. This stub provides the
- * interface that main.ts consumes, delegating to the lockstep engine
- * when the netcode is active.
- */
-
-let mpState: MultiplayerState = {
-  mode: "local",
-  roomCode: null,
-  peerCount: 1,
-  connected: false,
-};
-
-export function getMultiplayerState(): MultiplayerState {
-  return { ...mpState };
+export function activeSession(): OnlineSession | null {
+  return current;
 }
 
-export function isMultiplayer(): boolean {
-  return mpState.mode !== "local";
+export function isOnline(): boolean {
+  return current !== null;
 }
 
-/** Host creates a room. Returns the invite code. */
-export async function hostRoom(game: GameState): Promise<string | null> {
-  // TODO: Implement via engine/net/lockstep.ts + engine/net/nostr.ts
-  // For now, return a mock room code
-  const code = Math.random().toString(36).slice(2, 8).toUpperCase();
-  mpState = { mode: "host", roomCode: code, peerCount: 1, connected: true };
-  return code;
+/** The GameState the render loop should draw (adapter-owned in MP, else null). */
+export function onlineGameState(): GameState | null {
+  return current?.adapter.state() ?? null;
 }
 
-/** Guest joins a room by invite code. */
-export async function joinRoom(
-  code: string,
-  game: GameState,
-): Promise<boolean> {
-  // TODO: Implement via engine/net/lockstep.ts + engine/net/nostr.ts
-  mpState = { mode: "guest", roomCode: code, peerCount: 2, connected: true };
-  return true;
+// ── Host ─────────────────────────────────────────────────────
+
+export async function hostMatch(
+  roomName: string,
+  playerName: string,
+  maxPlayers: number,
+): Promise<OnlineSession> {
+  const match = await Match.createPrivate(roomName, maxPlayers, playerName, 0);
+  const adapter = createEngineAdapter();
+  const session = new LockstepSession(match, adapter, "host");
+  current = { match, session, adapter, role: "host" };
+  return current;
 }
 
-/** Broadcast the active player's input to peers. */
-export function broadcastTurnInput(
-  game: GameState,
-  tankIndex: number,
-  angle: number,
-  power: number,
-  weapon: number,
+// ── Join ─────────────────────────────────────────────────────
+
+export async function joinMatch(
+  inviteCode: string,
+  playerName: string,
+): Promise<OnlineSession> {
+  const info = Match.parseInvite(inviteCode);
+  if (!info) throw new Error("Invalid invite code");
+  const match = await Match.join(info, playerName, 0);
+  const adapter = createEngineAdapter();
+  const session = new LockstepSession(match, adapter, "guest");
+  current = { match, session, adapter, role: "guest" };
+  return current;
+}
+
+// ── Match start (host) ───────────────────────────────────────
+
+export function buildAndStartMatch(
+  session: OnlineSession,
+  roster: RoomPlayer[],
+  width: number,
+  height: number,
+  cfg: Config,
 ): void {
-  if (!isMultiplayer()) return;
-  // TODO: Send via WebRTC data channel
+  // Humans: every roster member. Computers: fill to 4 with Unknown class
+  // (the engine reveals a random personality at first turn).
+  const order: MatchStart["order"] = roster.map((p, i) => ({
+    deviceId: p.deviceId,
+    name: p.name,
+    aiClass: 0, // human
+    tankIcon: p.tankIcon ?? (i % 7),
+  }));
+  while (order.length < 4) {
+    order.push({
+      deviceId: `cpu-${order.length}`,
+      name: `VentureBot ${order.length}`,
+      aiClass: 8, // AI_UNKNOWN
+      tankIcon: order.length % 7,
+    });
+  }
+  const seed = crypto.getRandomValues(new Uint32Array(1))[0];
+  const start: MatchStart = {
+    seed,
+    w: width,
+    h: height,
+    cfg: {
+      ...(cfg as unknown as Record<string, unknown>),
+      TEAM_MODE: "NONE",
+      PLAY_MODE: "SEQUENTIAL",
+      TALKING_TANKS: "ALL",
+    },
+    order,
+  };
+  pendingStart = start;
+  session.session.startMatch(start);
 }
 
-/** Check for incoming turn inputs from peers. */
-export function pollRemoteInputs(game: GameState): void {
-  if (!isMultiplayer()) return;
-  // TODO: Read from WebRTC data channel buffer, apply to game
+// ── Turn input routing ───────────────────────────────────────
+
+/** The local human tank index in the online game, or -1. */
+export function localHumanIndex(gs: GameState): number {
+  const devs = current?.adapter.deviceIds() ?? [];
+  const i = devs.indexOf(DEVICE_ID);
+  return i;
 }
 
-/** Leave the current multiplayer session. */
-export function leaveRoom(): void {
-  mpState = { mode: "local", roomCode: null, peerCount: 1, connected: false };
+export function commitOnlineTurn(input: TurnInput): void {
+  current?.session.commitTurn(input);
+}
+
+export function pumpOnline(): void {
+  if (!current) return;
+  const gs = current.adapter.state();
+  if (gs && gs.phase === "aim" && !gs.awaiting_human) {
+    // not a human turn locally (AI or remote); let the session resolve it
+  }
+  current.session.tryPump();
+}
+
+// ── Chat ─────────────────────────────────────────────────────
+
+export function sendOnlineChat(text: string): void {
+  current?.session.sendChat(text);
+}
+
+export function onOnlineChat(cb: (deviceId: string, text: string) => void): void {
+  if (current) current.session.onChat = cb;
+}
+
+// ── Desync / teardown ────────────────────────────────────────
+
+export function detachOnline(): void {
+  current?.session.detach();
+}
+
+export function leaveOnline(): void {
+  current?.match?.leave();
+  current = null;
+  pendingStart = null;
+}
+
+export function pendingStartData(): MatchStart | null {
+  return pendingStart;
 }

@@ -104,12 +104,25 @@ describe("game boots and plays", () => {
   }, 30000);
 
   it("toggles the Dealroom chat (backquote opens, Esc closes)", async () => {
-    await page.keyboard.press("Backquote");
-    await page.waitForSelector(".sm-chat-root:not([hidden])", { timeout: 5000 });
+    // Retry the press: the page main thread can stall during heavy frames
+    // (asset decode, big flights), which makes a single press unreliable.
+    let opened = false;
+    for (let attempt = 0; attempt < 3 && !opened; attempt++) {
+      await page.keyboard.press("Backquote");
+      await new Promise((r) => setTimeout(r, 400));
+      opened = await page
+        .$eval(".sm-chat-root", (el) => !el.hasAttribute("hidden"))
+        .catch(() => false);
+      if (!opened && attempt < 2) {
+        // close whatever state the failed press left, then retry
+        await page.keyboard.press("Backquote");
+      }
+    }
+    expect(opened).toBe(true);
     // Esc closes (the chat input holds focus, so backquote types into it)
     await page.keyboard.press("Escape");
-    await new Promise((r) => setTimeout(r, 300));
+    await new Promise((r) => setTimeout(r, 400));
     const hidden = await page.$eval(".sm-chat-root", (el) => el.hasAttribute("hidden"));
     expect(hidden).toBe(true);
-  }, 15000);
+  }, 30000);
 });

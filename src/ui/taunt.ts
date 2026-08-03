@@ -53,7 +53,7 @@ export interface TauntShowOptions {
 /* Portraits — assets/portraits/*.png (CHARACTERS.md roster).                 */
 /* -------------------------------------------------------------------------- */
 
-const PORTRAIT_DIR = "/assets/portraits/";
+const PORTRAIT_DIR = "./portraits/";
 
 /** File base name per recognizable roster name (CHARACTERS.md). */
 const PORTRAIT_ROSTER: ReadonlyArray<readonly [string, string]> = [

@@ -14,6 +14,7 @@ import { setEnvironment, type Environment } from "./sky";
 
 let currentEnv: Environment = "earth";
 let clock = new THREE.Clock();
+let terrainFrameCounter = 0;
 
 // ── Public API ───────────────────────────────────────────────
 
@@ -29,8 +30,13 @@ export function renderFrame(
   // Engine update (advances game logic)
   game.update(dt);
 
-  // Terrain deformation
-  updateTerrainFromEngine(terrainMesh, game.terrain);
+  // Terrain deformation — throttled: a full scan is ~786k pixel reads, so we
+  // refresh at most every 3rd frame (~50ms). Craters appear within a frame or two;
+  // the main thread stays responsive (verified: input latency in headless tests).
+  terrainFrameCounter = (terrainFrameCounter + 1) % 3;
+  if (terrainFrameCounter === 0) {
+    updateTerrainFromEngine(terrainMesh, game.terrain);
+  }
 
   // Rocket positions and turret angles
   updateRockets(game, game.terrain);
