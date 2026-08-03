@@ -72,7 +72,27 @@ game.new_game();
 
 // ── Terrain mesh (driven by engine) ──────────────────────────
 const terrainMesh = createTerrainMesh(game.terrain, viewWidth);
+terrainMesh.material = new THREE.MeshStandardMaterial({ color: 0x5c4033, flatShading: true });
 scene.add(terrainMesh);
+
+// ── Placeholder rockets (colored cylinders) ──────────────────
+const tankMarkers: THREE.Mesh[] = [];
+const tankColors = [0x4488ff, 0xff8844, 0xff4444, 0x44ff44];
+for (let i = 0; i < game.tanks.length; i++) {
+  const geo = new THREE.CylinderGeometry(4, 5, 20, 8);
+  const mat = new THREE.MeshStandardMaterial({ color: tankColors[i], flatShading: true });
+  const marker = new THREE.Mesh(geo, mat);
+  marker.position.set(0, 0, 0);
+  marker.visible = false;
+  scene.add(marker);
+  tankMarkers.push(marker);
+}
+
+// ── HUD overlay ───────────────────────────────────────────────
+const hudEl = document.createElement("div");
+hudEl.id = "game-hud";
+hudEl.style.cssText = "position:fixed;top:10px;left:10px;z-index:20;color:#fff;font-family:system-ui;font-size:16px;background:rgba(0,0,0,0.6);padding:8px 12px;border-radius:6px;pointer-events:none;";
+document.body.appendChild(hudEl);
 
 // ── Environment ──────────────────────────────────────────────
 setEnvironment(scene, "earth");
@@ -134,10 +154,37 @@ function animate(): void {
   requestAnimationFrame(animate);
 
   renderFrame(game, scene, camera, terrainMesh);
+
+  // Update tank markers
+  for (let i = 0; i < game.tanks.length; i++) {
+    const t = game.tanks[i];
+    if (t.alive) {
+      const px = Math.round(t.x);
+      for (let py = 0; py < game.terrain.h; py++) {
+        if (game.terrain.is_dirt(px, py)) {
+          tankMarkers[i].position.set(px - game.w / 2, ((game.h - py) / game.h) * 300, 0);
+          tankMarkers[i].visible = true;
+          break;
+        }
+      }
+    } else {
+      tankMarkers[i].visible = false;
+    }
+  }
+
+  // Update HUD
+  const shooter = game.current_shooter;
+  if (shooter) {
+    const phaseNames: Record<string, string> = { aim: "AIM", turn_start: "WATCH", firing: "FLIGHT", settle: "SETTLE" };
+    hudEl.textContent = `${shooter.name} | ${phaseNames[game.phase] || game.phase} | Angle: ${shooter.angle}° Power: ${shooter.power} | Wind: ${game.cfg.wind}`;
+  }
+
   renderer.render(scene, camera);
 }
 
 // ── Boot ─────────────────────────────────────────────────────
+let gameStarted = false;
+
 async function boot(): Promise<void> {
   const bar = document.getElementById("loading-bar") as HTMLElement;
   const pct = document.getElementById("loading-pct") as HTMLElement;
@@ -145,9 +192,8 @@ async function boot(): Promise<void> {
 
   function hideLoading(msg?: string) {
     bar.style.width = "100%";
-    pct.textContent = msg ?? "Ready";
+    pct.textContent = msg ?? "Click anywhere to play";
     pct.style.color = msg ? "#f44" : "";
-    setTimeout(() => loadingEl?.classList.add("done"), 600);
   }
 
   function update(msg: string, pctVal: number) {
@@ -156,23 +202,31 @@ async function boot(): Promise<void> {
   }
 
   try {
-    // Seed the RNG
     update("Seeding RNG...", 10);
     rng.seed(42);
 
-    // Init engine
     update("Starting engine...", 20);
     game.start_round();
 
     update("Building terrain...", 60);
 
-    // Spawn rockets (non-blocking)
     update("Loading rockets...", 80);
     spawnAllRockets().catch(() => {});
 
     update("", 100);
     hideLoading();
-    requestAnimationFrame(animate);
+
+    // Start game on first click/key
+    function startGame() {
+      if (gameStarted) return;
+      gameStarted = true;
+      loadingEl?.classList.add("done");
+      requestAnimationFrame(animate);
+      document.removeEventListener("click", startGame);
+      document.removeEventListener("keydown", startGame);
+    }
+    document.addEventListener("click", startGame);
+    document.addEventListener("keydown", startGame);
   } catch (err) {
     console.error("Boot failed:", err);
     hideLoading("Error: " + String(err).slice(0, 60));
