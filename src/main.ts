@@ -6,9 +6,10 @@ import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { GameState } from "./engine/game";
 import { rng } from "./engine/rng";
 import { Config } from "./engine/config";
-import { createTerrainMesh, updateTerrainFromEngine } from "./render/terrain";
+import { createTerrainMesh } from "./render/terrain";
 import { renderFrame } from "./render/loop";
 import { setEnvironment } from "./render/sky";
+import { preloadAllVoices, playFireTaunt, playKillTaunt, playDeathScream } from "./audio/voices";
 
 // ── Canvas & Renderer ────────────────────────────────────────
 const canvas = document.getElementById("game") as HTMLCanvasElement;
@@ -141,6 +142,7 @@ hudEl.style.cssText = "position:fixed;top:10px;left:10px;z-index:20;color:#fff;f
 document.body.appendChild(hudEl);
 
 // ── Input ────────────────────────────────────────────────────
+let prevAlive = game.tanks.map(t => t.alive);
 window.addEventListener("keydown", (e) => {
   if (game.phase === "aim" && game.awaiting_human) {
     const t = game.current_shooter!;
@@ -149,7 +151,11 @@ window.addEventListener("keydown", (e) => {
     if (e.key === "ArrowUp") t.power = Math.min(1000, t.power + 30);
     if (e.key === "ArrowDown") t.power = Math.max(0, t.power - 30);
     if (e.key === "Tab") { e.preventDefault(); t.selected_weapon = (t.selected_weapon + 1) % 32; }
-    if (e.key === " " || e.key === "Enter") { e.preventDefault(); game.fire(); }
+    if (e.key === " " || e.key === "Enter") {
+      e.preventDefault();
+      game.fire();
+      playFireTaunt(t);
+    }
   }
 });
 
@@ -167,6 +173,14 @@ window.addEventListener("resize", () => {
 function animate(): void {
   requestAnimationFrame(animate);
   renderFrame(game, scene, camera, terrainMesh);
+
+  // Death detection
+  for (let i = 0; i < game.tanks.length; i++) {
+    if (prevAlive[i] && !game.tanks[i].alive) {
+      playDeathScream(game.tanks[i]);
+    }
+  }
+  prevAlive = game.tanks.map(t => t.alive);
 
   for (let i = 0; i < game.tanks.length; i++) {
     const t = game.tanks[i];
@@ -242,6 +256,7 @@ async function boot() {
     pct.textContent = "Loading assets...";
     bar.style.width = "60%";
     preloadAssets().catch(() => {});
+    preloadAllVoices().catch(() => {});
 
     bar.style.width = "100%";
     pct.textContent = "";
