@@ -1,20 +1,26 @@
 /**
  * Scorched Billionaire — Entry point.
+ * Boots the deterministic engine and the Three.js renderer,
+ * wires the game loop: title -> rounds (Earth/Moon/Mars) -> shop -> game over.
  */
+
 import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
-import { GameState } from "./engine/game";
+import { GameState, SHOP, GAME_OVER, ROUND_END } from "./engine/game";
 import { rng } from "./engine/rng";
 import { Config } from "./engine/config";
 import { createTerrainMesh } from "./render/terrain";
-import { renderFrame } from "./render/loop";
+import { renderFrame, roundToEnvironment } from "./render/loop";
 import { setEnvironment } from "./render/sky";
 import { loadExplosionTexture } from "./render/effects";
 import { preloadAllVoices, playFireTaunt, playKillTaunt, playDeathScream } from "./audio/voices";
+import { sfx } from "./engine/sound";
+import { Hud } from "./ui/hud";
+import { ShopOverlay } from "./ui/shop";
 
 // ── Canvas & Renderer ────────────────────────────────────────
 const canvas = document.getElementById("game") as HTMLCanvasElement;
-const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, preserveDrawingBuffer: true });
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.shadowMap.enabled = true;
@@ -64,7 +70,7 @@ config.GRAVITY = 0.2;
 config.wind = 0;
 config.MAX_WIND = 200;
 config.INITIAL_CASH = 5000;
-config.SOUND = "OFF";
+config.SOUND = "OFF"; // enabled on user gesture (PLAY click)
 
 const game = new GameState(config, 1024, 768);
 game.add_player("Elon Musk", 0, 0, 0);
@@ -78,36 +84,56 @@ const terrainMesh = createTerrainMesh(game.terrain, viewWidth);
 terrainMesh.position.set(0, 0, 0);
 scene.add(terrainMesh);
 
-// ── Tank markers (colored capsules) ──────────────────────────
-const tankMarkers: THREE.Mesh[] = [];
+// ── Environment config per planet (gravity/wind/viscosity) ───
+const ENV_CFG: Record<string, { gravity: number; wind: number; visc: number }> = {
+  earth: { gravity: 0.2, wind: 0, visc: 1.0 },
+  moon: { gravity: 0.033, wind: 0, visc: 1.0 },
+  mars: { gravity: 0.075, wind: 0, visc: 0.7 },
+};
+let currentEnv: string | null = null;
+function applyEnvironment(env: string): void {
+  if (env === currentEnv) return;
+  currentEnv = env;
+  const c = ENV_CFG[env];
+  config.GRAVITY = c.gravity;
+  config.wind = c.wind;
+  // viscosity_mult is a getter over AIR_VISCOSITY: mult = 1 - V/10000
+  config.AIR_VISCOSITY = Math.round((1 - c.visc) * 10000);
+  setEnvironment(scene, env as any);
+  // Swap terrain texture
+  const texName = env === "earth" ? "earth_surface_v4" : env === "moon" ? "moon_surface_v2" : "mars_surface_v2";
+  new THREE.TextureLoader().load(`./assets/${texName}.png`, (tex) => {
+    const mat = terrainMesh.material as THREE.MeshStandardMaterial;
+    mat.map = tex;
+    mat.color.set(0xffffff);
+    mat.needsUpdate = true;
+  }, undefined, () => {});
+}
+
+// ── Tank markers (colored capsules + labels) ─────────────────
+const tankMarkers: THREE.Group[] = [];
 const tankColors = [0x4488ff, 0xff8844, 0xff2222, 0x44dd44];
 const tankNames = ["Elon", "Bezos", "Trump", "Altman"];
 for (let i = 0; i < game.tanks.length; i++) {
   const group = new THREE.Group();
-  // Body
-  const bodyGeo = new THREE.CylinderGeometry(3, 4, 18, 8);
   const bodyMat = new THREE.MeshStandardMaterial({ color: tankColors[i], flatShading: true });
-  const body = new THREE.Mesh(bodyGeo, bodyMat);
+  const body = new THREE.Mesh(new THREE.CylinderGeometry(3, 4, 18, 8), bodyMat);
   body.position.y = 9;
   group.add(body);
-  // Nose cone
-  const noseGeo = new THREE.ConeGeometry(3, 6, 8);
-  const nose = new THREE.Mesh(noseGeo, bodyMat);
+  const nose = new THREE.Mesh(new THREE.ConeGeometry(3, 6, 8), bodyMat);
   nose.position.y = 21;
   group.add(nose);
-  // Label
-  const sprite = new THREE.Sprite(new THREE.SpriteMaterial({
+  const label = new THREE.Sprite(new THREE.SpriteMaterial({
     map: createLabelTexture(tankNames[i], tankColors[i]),
     transparent: true,
     depthTest: false,
   }));
-  sprite.position.y = 28;
-  sprite.scale.set(30, 10, 1);
-  group.add(sprite);
+  label.position.y = 30;
+  label.scale.set(30, 10, 1);
+  group.add(label);
   group.visible = false;
   scene.add(group);
-  tankMarkers.push(group as any);
-  tankMarkers[i].userData = { body };
+  tankMarkers.push(group);
 }
 
 function createLabelTexture(text: string, color: number): THREE.Texture {
@@ -137,13 +163,11 @@ titleEl.innerHTML = `
 titleEl.style.cssText = "position:fixed;inset:0;z-index:200;";
 document.body.appendChild(titleEl);
 
-// ── HUD ──────────────────────────────────────────────────────
-const hudEl = document.createElement("div");
-hudEl.style.cssText = "position:fixed;top:10px;left:10px;z-index:20;color:#fff;font-family:system-ui;font-size:14px;background:rgba(0,0,0,0.7);padding:8px 14px;border-radius:6px;pointer-events:none;display:none;";
-document.body.appendChild(hudEl);
+// ── HUD (agent-built, mounted on PLAY) ───────────────────────
+let hud: Hud | null = null;
+let hudActive = false;
 
 // ── Input ────────────────────────────────────────────────────
-let prevAlive = game.tanks.map(t => t.alive);
 window.addEventListener("keydown", (e) => {
   if (game.phase === "aim" && game.awaiting_human) {
     const t = game.current_shooter!;
@@ -170,81 +194,140 @@ window.addEventListener("resize", () => {
   renderer.setSize(window.innerWidth, window.innerHeight);
 });
 
+// ── Round / shop / game-over flow state ──────────────────────
+let prevAlive = game.tanks.map(t => t.alive);
+let lastFirer: (typeof game.tanks)[number] | null = null;
+let shopOpen: ShopOverlay | null = null;
+let standingsShown = false;
+let roundIndex = 0;
+
 // ── Render ───────────────────────────────────────────────────
 function animate(): void {
   requestAnimationFrame(animate);
   renderFrame(game, scene, camera, terrainMesh);
 
-  // Death detection
+  // Environment swap at round boundaries
+  const env = roundToEnvironment(game.round_index);
+  applyEnvironment(env);
+
+  // Track who fired last (for kill attribution)
+  if (game.phase === "firing" && game.current_shooter) {
+    lastFirer = game.current_shooter;
+  }
+
+  // Death detection: killer taunt + victim scream
   for (let i = 0; i < game.tanks.length; i++) {
     if (prevAlive[i] && !game.tanks[i].alive) {
-      playDeathScream(game.tanks[i]);
+      const victim = game.tanks[i];
+      if (lastFirer && lastFirer !== victim && lastFirer.alive) {
+        playKillTaunt(lastFirer);
+      }
+      playDeathScream(victim);
     }
   }
   prevAlive = game.tanks.map(t => t.alive);
 
+  // Tank marker positions + 3D rocket sync
   for (let i = 0; i < game.tanks.length; i++) {
     const t = game.tanks[i];
-    if (!t.alive) { tankMarkers[i].visible = false; continue; }
+    const marker = tankMarkers[i];
+    if (!t.alive) { marker.visible = false; continue; }
     const px = Math.round(t.x);
     for (let py = 0; py < game.terrain.h; py++) {
       if (game.terrain.is_dirt(px, py)) {
-        tankMarkers[i].position.set(px - game.w / 2, ((game.h - py) / game.h) * 300 + 4, 0);
-        tankMarkers[i].visible = true;
+        const wx = px - game.w / 2;
+        const wy = ((game.h - py) / game.h) * 300 + 4;
+        marker.position.set(wx, wy, 0);
+        marker.visible = true;
+        const m3d = marker.userData.model3d;
+        if (m3d) {
+          m3d.position.set(wx, wy, 0);
+          m3d.visible = true;
+        }
         break;
       }
     }
   }
 
-  const s = game.current_shooter;
-  if (s) {
-    const p: Record<string, string> = { aim: "🎯 YOUR TURN", turn_start: "⏳", firing: "🔥", settle: "💨" };
-    hudEl.innerHTML = `<b>${s.name}</b> &nbsp; ${p[game.phase] || game.phase} &nbsp; | &nbsp; ${s.angle}° &nbsp; ${s.power} &nbsp; | Wind: ${game.cfg.wind}`;
+  // HUD
+  if (hudActive && hud) {
+    const s = game.current_shooter;
+    hud.update({
+      angle: s?.angle ?? 90,
+      power: s?.power ?? 0,
+      wind: game.cfg.wind,
+      tank: s ? {
+        name: s.name, health: s.health, maxHealth: 100, alive: s.alive,
+        shieldHp: s.shield_hp, shieldItem: s.shield_item,
+      } : null,
+      weaponSlot: s?.selected_weapon ?? 0,
+      timeLeft: undefined,
+      turnLabel: game.phase === "aim" && game.awaiting_human ? "YOUR TURN"
+        : game.phase === "firing" ? "FLIGHT" : "",
+    });
+  }
+
+  // Shop phase: mount the Cap Table overlay
+  if (game.phase === SHOP && !shopOpen) {
+    const human = game.tanks.find(t => t.ai_class === 0);
+    if (human) {
+      shopOpen = new ShopOverlay(game.economy, human as any);
+      shopOpen.open();
+    }
+  }
+  if (game.phase !== SHOP && shopOpen) {
+    shopOpen.destroy();
+    shopOpen = null;
+  }
+  // Shop closed by user -> AI buys -> next round
+  if (game.phase === SHOP && shopOpen && !(shopOpen as any).visible) {
+    game.run_ai_buys();
+    game.begin_next_round();
+    shopOpen = null;
+  }
+
+  // Round end: brief standings, then proceed (auto)
+  if (game.phase === ROUND_END) {
+    if (!standingsShown) {
+      standingsShown = true;
+      roundIndex = game.round_index;
+    }
+    game.proceed_after_round();
+  } else {
+    standingsShown = false;
+  }
+
+  // Game over: restart
+  if (game.phase === GAME_OVER) {
+    location.reload();
   }
 
   renderer.render(scene, camera);
 }
 
-// ── Load rocket models & terrain texture ─────────────────────
+// ── Load rocket models & assets ──────────────────────────────
 const loader = new GLTFLoader();
 const modelPaths = ["./models/falcon9.glb", "./models/new_shepard.glb", "./models/starship.glb", "./models/delta_spaceplane.glb", "./models/terran_r.glb"];
-const loadedModels: (THREE.Group | null)[] = [];
 
-async function preloadAssets() {
-  // Load terrain texture
-  const texLoader = new THREE.TextureLoader();
-  texLoader.load("./assets/moon_surface_v2.png", (tex) => {
-    const mat = terrainMesh.material as THREE.MeshStandardMaterial;
-    mat.map = tex;
-    mat.color.set(0xffffff);
-    mat.needsUpdate = true;
-  }, undefined, () => {});
-
-  // Load rocket models
+async function preloadAssets(): Promise<void> {
   for (let i = 0; i < modelPaths.length; i++) {
     try {
       const gltf = await loader.loadAsync(modelPaths[i]);
-      loadedModels[i] = gltf.scene;
-    } catch {
-      loadedModels[i] = null;
-    }
-  }
-  // Replace markers with models
-  for (let i = 0; i < game.tanks.length; i++) {
-    const modelIdx = i < modelPaths.length ? i : 0;
-    const model = loadedModels[modelIdx];
-    if (model) {
-      const clone = model.clone();
+      const clone = gltf.scene.clone(true);
       clone.scale.set(0.15, 0.15, 0.15);
-      clone.position.copy(tankMarkers[i].position);
+      clone.visible = false;
       scene.add(clone);
-      tankMarkers[i].userData.model3d = clone;
+      if (i < game.tanks.length) {
+        tankMarkers[i].userData.model3d = clone;
+      }
+    } catch {
+      // model unavailable; markers remain
     }
   }
 }
 
 // ── Boot ─────────────────────────────────────────────────────
-async function boot() {
+async function boot(): Promise<void> {
   const bar = document.getElementById("loading-bar") as HTMLElement;
   const pct = document.getElementById("loading-pct") as HTMLElement;
   const loadingEl = document.getElementById("loading")!;
@@ -265,8 +348,12 @@ async function boot() {
 
     document.getElementById("btn-play")!.addEventListener("click", () => {
       titleEl.remove();
-      hudEl.style.display = "block";
       loadingEl.classList.add("done");
+      // Enable engine sound + voices now that we have a user gesture
+      config.SOUND = "ON";
+      sfx.enabled = true;
+      hud = new Hud();
+      hudActive = true;
       requestAnimationFrame(animate);
     });
 
@@ -278,5 +365,5 @@ async function boot() {
   }
 }
 
-setEnvironment(scene, "earth");
+applyEnvironment("earth");
 boot();
