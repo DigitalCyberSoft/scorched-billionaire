@@ -212,8 +212,16 @@ export class ChatOverlay {
       else this.push("Feed", "no uplink — message dropped", "warn");
     };
     this.input.addEventListener("keydown", (e) => {
-      e.stopPropagation();
-      if (e.key === "Enter") submit();
+      if (e.key === "Enter") {
+        e.preventDefault();
+        submit();
+      } else if (e.key === "Escape") {
+        // let the window handler close the chat (Esc cancels)
+        return;
+      } else {
+        // don't let game hotkeys fire while typing
+        e.stopPropagation();
+      }
     });
     this.sendBtn.addEventListener("click", submit);
 

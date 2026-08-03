@@ -81,4 +81,35 @@ describe("game boots and plays", () => {
   it("has no page JS errors", async () => {
     expect(jsErrors).toEqual([]);
   });
+
+  it("opens the Cap Table shop between rounds and advances", async () => {
+    // Drive the engine to the shop phase via the dev hook
+    await page.evaluate(() => {
+      const g = (window as any).__game;
+      if (g) g.proceed_after_round();
+    });
+    // Shop overlay must mount
+    await page.waitForSelector(".sm-shop", { timeout: 15000 });
+    const title = await page.$eval(".sm-shop-title", (el) => el.textContent);
+    expect(title).toContain("CAP TABLE");
+    // Close the shop -> AI buys -> next round starts
+    await page.evaluate(() => {
+      const g = (window as any).__game;
+      if (g) g.begin_next_round();
+    });
+    await new Promise((r) => setTimeout(r, 2000));
+    // Shop overlay must be gone (animate loop destroys it on phase change)
+    const shopGone = await page.$eval(".sm-shop", () => true).catch(() => false);
+    expect(shopGone).toBe(false);
+  }, 30000);
+
+  it("toggles the Dealroom chat (backquote opens, Esc closes)", async () => {
+    await page.keyboard.press("Backquote");
+    await page.waitForSelector(".sm-chat-root:not([hidden])", { timeout: 5000 });
+    // Esc closes (the chat input holds focus, so backquote types into it)
+    await page.keyboard.press("Escape");
+    await new Promise((r) => setTimeout(r, 300));
+    const hidden = await page.$eval(".sm-chat-root", (el) => el.hasAttribute("hidden"));
+    expect(hidden).toBe(true);
+  }, 15000);
 });

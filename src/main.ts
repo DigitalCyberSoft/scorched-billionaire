@@ -17,6 +17,7 @@ import { preloadAllVoices, playFireTaunt, playKillTaunt, playDeathScream } from 
 import { sfx } from "./engine/sound";
 import { Hud } from "./ui/hud";
 import { ShopOverlay } from "./ui/shop";
+import { ChatOverlay } from "./ui/chat";
 
 // ── Canvas & Renderer ────────────────────────────────────────
 const canvas = document.getElementById("game") as HTMLCanvasElement;
@@ -166,6 +167,9 @@ document.body.appendChild(titleEl);
 // ── HUD (agent-built, mounted on PLAY) ───────────────────────
 let hud: Hud | null = null;
 let hudActive = false;
+
+// ── Chat (Dealroom Feed, backquote toggles) ──────────────────
+let chat: ChatOverlay | null = null;
 
 // ── Input ────────────────────────────────────────────────────
 window.addEventListener("keydown", (e) => {
@@ -354,6 +358,7 @@ async function boot(): Promise<void> {
       sfx.enabled = true;
       hud = new Hud();
       hudActive = true;
+      chat = new ChatOverlay({ onSend: (text) => chat?.system(`relayed to 0 peers: "${text}"`) });
       requestAnimationFrame(animate);
     });
 
@@ -367,3 +372,7 @@ async function boot(): Promise<void> {
 
 applyEnvironment("earth");
 boot();
+
+// ── Dev hooks (used by integration tests) ─────────────────────
+(window as any).__game = game;
+(window as any).__scene = scene;
